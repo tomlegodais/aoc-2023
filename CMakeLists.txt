@@ -13,6 +13,7 @@ add_executable(aoc_2023 main.cpp
         include/util/string_utils.hpp src/util/string_utils.cpp
         include/puzzle/day_puzzle.hpp include/puzzle/puzzle_registrar.hpp
         include/puzzle/puzzle_registry.hpp src/puzzle/puzzle_registry.cpp
-        include/puzzle/day01_puzzle.hpp src/puzzle/day01_puzzle.cpp)
+        include/puzzle/day01_puzzle.hpp src/puzzle/day01_puzzle.cpp
+        include/puzzle/day02_puzzle.hpp src/puzzle/day02_puzzle.cpp)
 
 target_link_libraries(aoc_2023 PRIVATE cpr::cpr)
