@@ -8,7 +8,7 @@ public:
 
     ~PuzzleService() = default;
 
-    std::string readPuzzleInput(int day);
+    virtual std::string readPuzzleInput(int day);
 
 private:
     Session &session_;

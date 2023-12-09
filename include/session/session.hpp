@@ -14,6 +14,10 @@ public:
 
     static Session init(const std::string &fileName);
 
+    static Session fromValue(const std::string &value) {
+        return Session(value);
+    }
+
     const std::string &getValue() {
         return value;
     }
