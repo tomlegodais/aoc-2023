@@ -38,8 +38,7 @@ int Day01Puzzle::solvePartTwo(std::string &puzzleInput) {
     int sum = 0;
     for (const auto &line: lines) {
         std::vector<std::pair<int, int>> indices;
-
-        for (size_t i = 0; i < line.length(); i++) {
+        for (auto i = 0; i < line.length(); i++) {
             if (std::isalpha(line[i])) {
                 for (const auto &pair: numberMapping) {
                     const std::string &word = pair.first;
