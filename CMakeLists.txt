@@ -1,9 +1,8 @@
+set(CMAKE_TOOLCHAIN_FILE "${CMAKE_CURRENT_SOURCE_DIR}/vcpkg/scripts/buildsystems/vcpkg.cmake")
 cmake_minimum_required(VERSION 3.27)
+
 project(aoc_2023)
-
 set(CMAKE_CXX_STANDARD 23)
-set(CMAKE_TOOLCHAIN_FILE "${VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake" CACHE STRING "Vcpkg toolchain file")
-
 enable_testing()
 
 find_package(GTest CONFIG REQUIRED)
