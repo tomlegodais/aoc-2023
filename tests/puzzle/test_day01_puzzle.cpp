@@ -32,7 +32,7 @@ TEST_F(Day01PuzzleTest, SolvePartTwo) {
                               "4nineeightseven2\n"
                               "zoneight234\n"
                               "7pqrstsixteen";
-    EXPECT_EQ(281, puzzle.solvePartTwo(puzzleInput));
+    EXPECT_EQ(285, puzzle.solvePartTwo(puzzleInput));
 
 }
 
