@@ -1,4 +1,5 @@
 #include <iostream>
+#include <limits>
 #include "session/session.hpp"
 #include "puzzle/puzzle_registry.hpp"
 #include "service/puzzle_service.hpp"
