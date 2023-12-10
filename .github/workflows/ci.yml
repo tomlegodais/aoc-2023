@@ -25,6 +25,5 @@ jobs:
           cd build
           cmake ..
           cmake --build .
-      - name: List directory
-        run: |
-          ls -laR
+      - name: Run Tests
+        run: ./build/aoc_2023_test
