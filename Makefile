@@ -1,13 +1,13 @@
-PROFILE ?= Debug
+BUILD_TYPE ?= Debug
 
 ifeq ($(OS),Windows_NT)
     MKDIR_CMD = if not exist "build" (mkdir build)
     RMDIR_CMD = if exist "build" (rmdir /s /q build)
-    BINARY = ./build/$(PROFILE)/aoc_2023.exe
+    BINARY = ./build/bin/aoc_2023.exe
 else
     MKDIR_CMD = mkdir -p build
     RMDIR_CMD = rm -rf build
-    BINARY = ./build/$(PROFILE)/aoc_2023
+    BINARY = ./build/bin/aoc_2023
 endif
 
 .PHONY: all setup build debug release run clean
@@ -16,16 +16,16 @@ all: setup build
 
 setup:
 	@$(MKDIR_CMD)
-	@cd build && cmake -DCMAKE_BUILD_TYPE=$(PROFILE) ..
+	@cd build && cmake -DCMAKE_BUILD_TYPE=$(BUILD_TYPE) ..
 
-build:
-	@cmake --build ./build --config $(PROFILE)
+build: setup
+	@cmake --build ./build
 
 debug:
-	@$(MAKE) all PROFILE=Debug
+	@$(MAKE) BUILD_TYPE=Debug all
 
 release:
-	@$(MAKE) all PROFILE=Release
+	@$(MAKE) BUILD_TYPE=Release all
 
 run:
 	@$(BINARY)
