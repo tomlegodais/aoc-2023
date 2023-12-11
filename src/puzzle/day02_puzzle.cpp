@@ -34,18 +34,17 @@ int Day02Puzzle::solvePartOne(std::string &puzzleInput) {
                 colorCounts[color] += count;
             }
 
-            for (const auto &colorMapping: COLOR_MAPPING) {
-                const auto &color = colorMapping.first;
-                const auto &max = colorMapping.second;
+            for (const auto & [fst, snd]: COLOR_MAPPING) {
+                const auto &color = fst;
 
-                if (colorCounts[color] > max) {
+                if (const auto &max = snd; colorCounts[color] > max) {
                     possible = false;
                     break;
                 }
             }
         }
 
-        if (possible) sum += (i + 1);
+        if (possible) sum += i + 1;
     }
 
     return sum;
