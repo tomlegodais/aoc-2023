@@ -30,5 +30,8 @@ release:
 run:
 	@$(BINARY)
 
+test: build
+	@cd build && ctest
+
 clean:
 	@$(RMDIR_CMD)

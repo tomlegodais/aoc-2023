@@ -1,11 +1,15 @@
 set(CMAKE_TOOLCHAIN_FILE "${CMAKE_CURRENT_SOURCE_DIR}/vcpkg/scripts/buildsystems/vcpkg.cmake")
-cmake_minimum_required(VERSION 3.27)
 
+cmake_minimum_required(VERSION 3.27)
 project(aoc_2023)
 set(CMAKE_CXX_STANDARD 23)
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
-set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+
+foreach (CONFIG_TYPE IN LISTS CMAKE_CONFIGURATION_TYPES CMAKE_BUILD_TYPE)
+    string(TOUPPER ${CONFIG_TYPE} CONFIG_TYPE_UPPER)
+    set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_${CONFIG_TYPE_UPPER} ${CMAKE_BINARY_DIR}/bin)
+    set(CMAKE_LIBRARY_OUTPUT_DIRECTORY_${CONFIG_TYPE_UPPER} ${CMAKE_BINARY_DIR}/lib)
+    set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY_${CONFIG_TYPE_UPPER} ${CMAKE_BINARY_DIR}/lib)
+endforeach ()
 
 enable_testing()
 
@@ -14,6 +18,7 @@ find_package(cpr CONFIG REQUIRED)
 
 include_directories(${PROJECT_SOURCE_DIR}/include)
 include_directories(${PROJECT_SOURCE_DIR}/tests)
+include(GoogleTest)
 
 add_executable(aoc_2023 main.cpp
         include/session/session.hpp src/session/session.cpp
@@ -35,3 +40,5 @@ target_link_libraries(aoc_2023_test PRIVATE
         cpr::cpr
         GTest::gtest GTest::gtest_main
         GTest::gmock GTest::gmock_main)
+
+gtest_discover_tests(aoc_2023_test)
