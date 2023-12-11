@@ -1,15 +1,27 @@
 #include <sstream>
 #include "puzzle/day02_puzzle.hpp"
 #include "util/string_utils.hpp"
+#include <map>
+
+const std::map<std::string, int> COLOR_MAPPING = {
+        {"red",   12},
+        {"green", 13},
+        {"blue",  14}
+};
 
 int Day02Puzzle::solvePartOne(std::string &puzzleInput) {
-    auto lines = StringUtils::splitOnNewline("Game 1: 3 blue, 4 red; 1 red, 2 green, 6 blue; 2 green");
-    for (const auto &line: lines) {
-        std::map<std::string, int> colorCounts;
+    auto lines = StringUtils::splitOnNewline(puzzleInput);
+    int sum = 0;
+
+    for (auto i = 0; i < lines.size(); i++) {
+        const auto &line = lines[i];
         std::istringstream iss(line.substr(line.find(':') + 1));
 
         std::string group;
+        bool possible = true;
+
         while (std::getline(iss, group, ';')) {
+            std::map<std::string, int> colorCounts;
             std::istringstream groupStream(group);
             std::string pair;
 
@@ -21,12 +33,22 @@ int Day02Puzzle::solvePartOne(std::string &puzzleInput) {
                 pairStream >> count >> color;
                 colorCounts[color] += count;
             }
+
+            for (const auto &colorMapping: COLOR_MAPPING) {
+                const auto &color = colorMapping.first;
+                const auto &max = colorMapping.second;
+
+                if (colorCounts[color] > max) {
+                    possible = false;
+                    break;
+                }
+            }
         }
 
-        // TODO: Finish this
+        if (possible) sum += (i + 1);
     }
 
-    return 0;
+    return sum;
 }
 
 int Day02Puzzle::solvePartTwo(std::string &puzzleInput) {
