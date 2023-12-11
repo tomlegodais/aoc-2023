@@ -7,7 +7,7 @@ protected:
     PuzzleService puzzleService_;
 
 public:
-    explicit DayPuzzle(const PuzzleService &puzzleService) : puzzleService_(puzzleService) {};
+    explicit DayPuzzle(const PuzzleService &puzzleService) : puzzleService_(puzzleService) {}
 
     virtual ~DayPuzzle() = default;
 

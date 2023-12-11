@@ -6,7 +6,7 @@ class PuzzleService {
 public:
     explicit PuzzleService(Session &session) : session_(session) {};
 
-    ~PuzzleService() = default;
+    virtual ~PuzzleService() = default;
 
     virtual std::string readPuzzleInput(int day);
 

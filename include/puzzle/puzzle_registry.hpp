@@ -4,7 +4,6 @@
 #include <functional>
 #include <memory>
 #include <utility>
-#include <stdexcept>
 #include "day_puzzle.hpp"
 
 using PuzzleConstructor = std::function<std::unique_ptr<DayPuzzle>(PuzzleService &)>;
@@ -21,7 +20,7 @@ public:
         return instance;
     }
 
-    void registerPuzzle(int day, PuzzleConstructor constructor, const std::string &title) {
+    void registerPuzzle(const int day, PuzzleConstructor constructor, const std::string &title) {
         info_[day] = {std::move(constructor), title};
     }
 

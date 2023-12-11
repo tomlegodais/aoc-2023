@@ -4,21 +4,22 @@
 #include <utility>
 
 class Session {
-private:
     std::string value;
 
-    explicit Session(std::string value) : value(std::move(value)) {};
+    explicit Session(std::string value) : value(std::move(value)) {
+        /* no-op */
+    }
 
 public:
     ~Session() = default;
 
-    static Session init(const std::string &fileName);
+    static Session init(const std::string& fileName);
 
-    static Session fromValue(const std::string &value) {
+    static Session fromValue(const std::string& value) {
         return Session(value);
     }
 
-    const std::string &getValue() {
+    const std::string& getValue() {
         return value;
     }
 };
