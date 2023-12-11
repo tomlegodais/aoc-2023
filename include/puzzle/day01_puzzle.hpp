@@ -3,9 +3,11 @@
 #include "day_puzzle.hpp"
 #include "puzzle_registrar.hpp"
 
-class [[maybe_unused]] Day01Puzzle final : public DayPuzzle {
+class [[maybe_unused]] Day01Puzzle final : public DayPuzzle
+{
 public:
-    explicit Day01Puzzle(const PuzzleService& puzzleService) : DayPuzzle(puzzleService) {
+    explicit Day01Puzzle(const PuzzleService& puzzleService) : DayPuzzle(puzzleService)
+    {
         /* no-op */
     }
 

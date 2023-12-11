@@ -5,14 +5,16 @@
 
 using testing::NiceMock;
 
-class Day02PuzzleTest : public testing::Test {
+class Day02PuzzleTest : public testing::Test
+{
 protected:
     Session dummySession;
     NiceMock<PuzzleServiceMock> puzzleServiceMock;
     std::string puzzleInput;
 
     Day02PuzzleTest() : dummySession(Session::fromValue("dummy")),
-                        puzzleServiceMock(dummySession) {
+                        puzzleServiceMock(dummySession)
+    {
         puzzleInput = "Game 1: 3 blue, 4 red; 1 red, 2 green, 6 blue; 2 green\n"
                 "Game 2: 1 blue, 2 green; 3 green, 4 blue, 1 red; 1 green, 1 blue\n"
                 "Game 3: 8 green, 6 blue, 20 red; 5 blue, 4 red, 13 green; 5 green, 1 red\n"
@@ -21,12 +23,14 @@ protected:
     }
 };
 
-TEST_F(Day02PuzzleTest, SolvePartOne) {
+TEST_F(Day02PuzzleTest, SolvePartOne)
+{
     Day02Puzzle puzzle(puzzleServiceMock);
     EXPECT_EQ(8, puzzle.solvePartOne(puzzleInput));
 }
 
-TEST_F(Day02PuzzleTest, SolvePartTwo) {
+TEST_F(Day02PuzzleTest, SolvePartTwo)
+{
     Day02Puzzle puzzle(puzzleServiceMock);
     EXPECT_EQ(2286, puzzle.solvePartTwo(puzzleInput));
 }

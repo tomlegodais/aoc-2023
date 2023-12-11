@@ -2,14 +2,18 @@
 
 #include "session/session.hpp"
 
-class PuzzleService {
+class PuzzleService
+{
 public:
-    explicit PuzzleService(Session &session) : session_(session) {};
+    explicit PuzzleService(Session& session) : session_(session)
+    {
+        /* empty */
+    }
 
     virtual ~PuzzleService() = default;
 
     virtual std::string readPuzzleInput(int day);
 
 private:
-    Session &session_;
+    Session& session_;
 };

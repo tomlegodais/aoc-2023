@@ -5,18 +5,21 @@
 
 using testing::NiceMock;
 
-class Day01PuzzleTest : public testing::Test {
+class Day01PuzzleTest : public testing::Test
+{
 protected:
     Session dummySession;
     NiceMock<PuzzleServiceMock> puzzleServiceMock;
 
     Day01PuzzleTest() : dummySession(Session::fromValue("dummy")),
-                        puzzleServiceMock(dummySession) {
+                        puzzleServiceMock(dummySession)
+    {
         /* no-op */
     }
 };
 
-TEST_F(Day01PuzzleTest, SolvePartOne) {
+TEST_F(Day01PuzzleTest, SolvePartOne)
+{
     Day01Puzzle puzzle(puzzleServiceMock);
     std::string puzzleInput = "1abc2\n"
             "pqr3stu8vwx\n"
@@ -25,7 +28,8 @@ TEST_F(Day01PuzzleTest, SolvePartOne) {
     EXPECT_EQ(142, puzzle.solvePartOne(puzzleInput));
 }
 
-TEST_F(Day01PuzzleTest, SolvePartTwo) {
+TEST_F(Day01PuzzleTest, SolvePartTwo)
+{
     Day01Puzzle puzzle(puzzleServiceMock);
     std::string puzzleInput = "two1nine\n"
             "eightwothree\n"
@@ -37,7 +41,8 @@ TEST_F(Day01PuzzleTest, SolvePartTwo) {
     EXPECT_EQ(281, puzzle.solvePartTwo(puzzleInput));
 }
 
-int main(int argc, char** argv) {
+int main(int argc, char** argv)
+{
     testing::InitGoogleTest(&argc, argv);
     return RUN_ALL_TESTS();
 }
