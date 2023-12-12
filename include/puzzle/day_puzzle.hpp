@@ -2,20 +2,16 @@
 
 #include "service/puzzle_service.hpp"
 
-class DayPuzzle
-{
+class DayPuzzle {
 protected:
-    PuzzleService puzzleService_;
+    PuzzleService puzzle_service_;
 
 public:
-    explicit DayPuzzle(const PuzzleService& puzzleService) : puzzleService_(puzzleService)
-    {
-        /* no-op */
-    }
+    explicit DayPuzzle(const PuzzleService &puzzle_service) : puzzle_service_(puzzle_service) {}
 
     virtual ~DayPuzzle() = default;
 
-    virtual int solvePartOne(std::string& puzzleInput) = 0;
+    virtual int solvePartOne(std::string &puzzle_input) = 0;
 
-    virtual int solvePartTwo(std::string& puzzleInput) = 0;
+    virtual int solvePartTwo(std::string &puzzle_input) = 0;
 };

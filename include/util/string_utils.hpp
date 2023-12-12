@@ -3,16 +3,15 @@
 #include <string>
 #include <vector>
 
-class StringUtils
-{
+class StringUtils {
 public:
     StringUtils() = delete;
 
     ~StringUtils() = delete;
 
-    StringUtils(const StringUtils&) = delete;
+    StringUtils(const StringUtils &) = delete;
 
-    StringUtils& operator=(const StringUtils&) = delete;
+    StringUtils &operator=(const StringUtils &) = delete;
 
-    static std::vector<std::string> splitOnNewline(const std::string& str);
+    static std::vector<std::string> splitOnNewline(const std::string &str);
 };

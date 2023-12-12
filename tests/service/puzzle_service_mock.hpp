@@ -1,16 +1,12 @@
 // ReSharper disable CppClassCanBeFinal
 #pragma once
 
-#include <gmock/gmock.h>
 #include "service/puzzle_service.hpp"
+#include <gmock/gmock.h>
 
-class PuzzleServiceMock : public PuzzleService
-{
+class PuzzleServiceMock : public PuzzleService {
 public:
-    explicit PuzzleServiceMock(Session session) : PuzzleService(session)
-    {
-        /* no-op */
-    }
+    explicit PuzzleServiceMock(Session session) : PuzzleService(session) {}
 
     MOCK_METHOD(std::string, readPuzzleInput, (int), (override));
 };

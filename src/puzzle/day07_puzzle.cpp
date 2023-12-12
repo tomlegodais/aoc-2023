@@ -1,53 +1,45 @@
 #include "puzzle/day07_puzzle.hpp"
-#include <algorithm>
-#include <ranges>
 #include "puzzle/puzzle_registrar.hpp"
 #include "util/string_utils.hpp"
+#include <algorithm>
+#include <ranges>
 
-struct Card
-{
+struct Card {
     std::string value_;
     int strength_;
 
-    explicit Card(const char ch)
-    {
+    explicit Card(const char ch) {
         static const std::unordered_map<char, std::pair<std::string, int>> mapping = {
-            {'A', {"Ace", 14}},
-            {'K', {"King", 13}},
-            {'Q', {"Queen", 12}},
-            {'J', {"Jack", 11}},
-            {'T', {"10", 10}},
+                {'A', {"Ace", 14}},
+                {'K', {"King", 13}},
+                {'Q', {"Queen", 12}},
+                {'J', {"Jack", 11}},
+                {'T', {"10", 10}},
         };
 
-        if (const auto it = mapping.find(ch); it != mapping.end())
-        {
+        if (const auto it = mapping.find(ch); it != mapping.end()) {
             value_ = it->second.first;
             strength_ = it->second.second;
-        } else
-        {
+        } else {
             value_ = std::string(1, ch);
             strength_ = ch - '0';
         }
     }
 };
 
-struct Hand
-{
+struct Hand {
     std::vector<Card> cards_;
     int bid_;
 
-    explicit Hand(const std::string& str)
-    {
-        for (int i = 0; i < 5; i++)
-        {
+    explicit Hand(const std::string &str) {
+        for (int i = 0; i < 5; i++) {
             cards_.emplace_back(str[i]);
         }
         bid_ = std::stoi(str.substr(6));
     }
 };
 
-enum class HandType
-{
+enum class HandType {
     FiveOfAKind,
     FourOfAKind,
     FullHouse,
@@ -57,25 +49,24 @@ enum class HandType
     HighCard
 };
 
-class PokerHand : public Hand
-{
+class PokerHand : public Hand {
     HandType type_;
 
-    [[nodiscard]] HandType determineHandType() const
-    {
+    [[nodiscard]] HandType determineHandType() const {
         std::unordered_map<char, int> frequency;
-        for (const auto& card: cards_)
-        {
+        for (const auto &card: cards_) {
             frequency[card.value_[0]]++;
         }
 
         int pairs = 0, triplets = 0, quads = 0, quints = 0;
-        for (const auto& val: frequency | std::views::values)
-        {
+        for (const auto &val: frequency | std::views::values) {
             if (val == 2) pairs++;
-            else if (val == 3) triplets++;
-            else if (val == 4) quads++;
-            else if (val == 5) quints++;
+            else if (val == 3)
+                triplets++;
+            else if (val == 4)
+                quads++;
+            else if (val == 5)
+                quints++;
         }
 
         if (quints == 1) return HandType::FiveOfAKind;
@@ -90,18 +81,15 @@ class PokerHand : public Hand
 public:
     using Hand::Hand;
 
-    explicit PokerHand(const std::string& str) : Hand(str)
-    {
+    explicit PokerHand(const std::string &str) : Hand(str) {
         type_ = this->determineHandType();
     }
 
-    bool operator<(const PokerHand& other) const
-    {
+    bool operator<(const PokerHand &other) const {
         if (type_ != other.type_)
             return type_ > other.type_;
 
-        for (int i = 0; i < cards_.size(); ++i)
-        {
+        for (int i = 0; i < cards_.size(); ++i) {
             if (cards_[i].strength_ != other.cards_[i].strength_)
                 return cards_[i].strength_ < other.cards_[i].strength_;
         }
@@ -109,29 +97,25 @@ public:
     }
 };
 
-int Day07Puzzle::solvePartOne(std::string& puzzleInput)
-{
+int Day07Puzzle::solvePartOne(std::string &puzzle_input) {
     std::vector<PokerHand> poker_hands;
-    for (auto const& lines = StringUtils::splitOnNewline(puzzleInput); auto const& line: lines)
-    {
+    for (const auto &line: StringUtils::splitOnNewline(puzzle_input)) {
         poker_hands.emplace_back(line);
     }
 
     std::sort(poker_hands.begin(), poker_hands.end());
 
     int total = 0;
-    for (int i = 0; i < poker_hands.size(); ++i)
-    {
+    for (int i = 0; i < poker_hands.size(); ++i) {
         total += poker_hands[i].bid_ * (i + 1);
     }
 
     return total;
 }
 
-int Day07Puzzle::solvePartTwo(std::string& puzzleInput)
-{
+int Day07Puzzle::solvePartTwo(std::string &puzzle_input) {
     return 0;
 }
 
 
-[[maybe_unused]] PuzzleRegistrar<7, Day07Puzzle> Day07Puzzle::registrar("Camel Cards");
+[[maybe_unused]] PuzzleRegistrar<7, Day07Puzzle> Day07Puzzle::registrar_("Camel Cards");
