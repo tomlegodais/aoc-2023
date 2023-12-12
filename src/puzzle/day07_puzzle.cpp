@@ -4,26 +4,51 @@
 #include <algorithm>
 #include <ranges>
 
+class CardMappingStrategy {
+protected:
+    ~CardMappingStrategy() = default;
+
+public:
+    explicit CardMappingStrategy(std::unordered_map<char, std::pair<std::string, int>> card_mapping)
+        : card_mapping_(std::move(card_mapping)) {}
+
+    [[nodiscard]] virtual std::pair<std::string, int> getCardProperties(const char ch) const {
+        if (const auto it = card_mapping_.find(ch); it != card_mapping_.end())
+            return it->second;
+
+        return {std::string(1, ch), ch - '0'};
+    }
+
+private:
+    std::unordered_map<char, std::pair<std::string, int>> card_mapping_;
+};
+
+class PartOneMappingStrategy final : public CardMappingStrategy {
+public:
+    PartOneMappingStrategy() : CardMappingStrategy({{'A', {"Ace", 14}},
+                                                    {'K', {"King", 13}},
+                                                    {'Q', {"Queen", 12}},
+                                                    {'J', {"Jack", 11}},
+                                                    {'T', {"10", 10}}}) {}
+};
+
+class PartTwoMappingStrategy final : public CardMappingStrategy {
+public:
+    PartTwoMappingStrategy() : CardMappingStrategy({{'A', {"Ace", 14}},
+                                                    {'K', {"King", 13}},
+                                                    {'Q', {"Queen", 12}},
+                                                    {'T', {"10", 10}},
+                                                    {'J', {"Joker", 1}}}) {}
+};
+
 struct Card {
     std::string value_;
     int strength_;
 
-    explicit Card(const char ch) {
-        static const std::unordered_map<char, std::pair<std::string, int>> mapping = {
-                {'A', {"Ace", 14}},
-                {'K', {"King", 13}},
-                {'Q', {"Queen", 12}},
-                {'J', {"Jack", 11}},
-                {'T', {"10", 10}},
-        };
-
-        if (const auto it = mapping.find(ch); it != mapping.end()) {
-            value_ = it->second.first;
-            strength_ = it->second.second;
-        } else {
-            value_ = std::string(1, ch);
-            strength_ = ch - '0';
-        }
+    explicit Card(const char ch, const CardMappingStrategy &strategy) {
+        const auto [card_value, card_strength] = strategy.getCardProperties(ch);
+        value_ = card_value;
+        strength_ = card_strength;
     }
 };
 
@@ -31,9 +56,9 @@ struct Hand {
     std::vector<Card> cards_;
     int bid_;
 
-    explicit Hand(const std::string &str) {
+    explicit Hand(const std::string &str, const CardMappingStrategy &strategy) {
         for (int i = 0; i < 5; i++) {
-            cards_.emplace_back(str[i]);
+            cards_.emplace_back(str[i], strategy);
         }
         bid_ = std::stoi(str.substr(6));
     }
@@ -54,8 +79,24 @@ class PokerHand : public Hand {
 
     [[nodiscard]] HandType determineHandType() const {
         std::unordered_map<char, int> frequency;
+        int jokerCount = 0;
         for (const auto &card: cards_) {
-            frequency[card.value_[0]]++;
+            if (card.value_ == "Joker") {
+                jokerCount++;
+            } else {
+                frequency[card.value_[0]]++;
+            }
+        }
+
+        for (int j = 0; j < jokerCount; ++j) {
+
+            if (auto bestUse = std::ranges::max_element(frequency,
+                                                        [](const auto &a, const auto &b) { return a.second < b.second; });
+                bestUse != frequency.end()) {
+                bestUse->second++;
+            } else {
+                frequency['*'] = 1;
+            }
         }
 
         int pairs = 0, triplets = 0, quads = 0, quints = 0;
@@ -81,7 +122,7 @@ class PokerHand : public Hand {
 public:
     using Hand::Hand;
 
-    explicit PokerHand(const std::string &str) : Hand(str) {
+    explicit PokerHand(const std::string &str, const CardMappingStrategy &strategy) : Hand(str, strategy) {
         type_ = this->determineHandType();
     }
 
@@ -97,10 +138,10 @@ public:
     }
 };
 
-int Day07Puzzle::solvePartOne(std::string &puzzle_input) {
+int solveWithStrategy(const std::string &puzzle_input, const CardMappingStrategy &strategy) {
     std::vector<PokerHand> poker_hands;
     for (const auto &line: StringUtils::splitOnNewline(puzzle_input)) {
-        poker_hands.emplace_back(line);
+        poker_hands.emplace_back(line, strategy);
     }
 
     std::sort(poker_hands.begin(), poker_hands.end());
@@ -113,8 +154,14 @@ int Day07Puzzle::solvePartOne(std::string &puzzle_input) {
     return total;
 }
 
+int Day07Puzzle::solvePartOne(std::string &puzzle_input) {
+    const PartOneMappingStrategy strategy;
+    return solveWithStrategy(puzzle_input, strategy);
+}
+
 int Day07Puzzle::solvePartTwo(std::string &puzzle_input) {
-    return 0;
+    const PartTwoMappingStrategy strategy;
+    return solveWithStrategy(puzzle_input, strategy);
 }
 
 
