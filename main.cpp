@@ -15,7 +15,7 @@ int promptForDay(const std::map<int, PuzzleInfo> &puzzleInfo) {
             return -1;
         }
 
-        if (std::cin.fail() || puzzleInfo.find(day) == puzzleInfo.end()) {
+        if (std::cin.fail() || !puzzleInfo.contains(day)) {
             std::cout << "The day you entered is invalid, please try again." << std::endl << std::endl;
             std::cin.clear();
             std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
@@ -26,10 +26,11 @@ int promptForDay(const std::map<int, PuzzleInfo> &puzzleInfo) {
     }
 }
 
-void solvePuzzle(int day, PuzzleService &puzzleService) {
-    std::cout << std::endl << "Solving puzzle for day " << day << ", please wait..." << std::endl;
+void solvePuzzle(const int day, PuzzleService &puzzleService) {
+    std::cout << std::endl
+              << "Solving puzzle for day " << day << ", please wait..." << std::endl;
 
-    auto puzzle = PuzzleRegistry::getInstance().createPuzzle(day, puzzleService);
+    const auto puzzle = PuzzleRegistry::getInstance().createPuzzle(day, puzzleService);
     auto puzzleInput = puzzleService.readPuzzleInput(day);
 
     std::cout << "Part one: " << puzzle->solvePartOne(puzzleInput) << std::endl;
@@ -38,20 +39,20 @@ void solvePuzzle(int day, PuzzleService &puzzleService) {
 
 int main() {
     try {
-        auto puzzleInfo = PuzzleRegistry::getInstance().getPuzzleInfo();
+        const auto puzzleInfo = PuzzleRegistry::getInstance().getPuzzleInfo();
         std::cout << "Advent of Code 2023" << std::endl;
         std::cout << "===================" << std::endl;
 
-        for (const auto &pair: puzzleInfo) {
-            std::cout << pair.first << ". Day " << pair.first << " (" << pair.second.title << ")" << std::endl;
-            if (pair.first == puzzleInfo.size()) {
+        for (const auto &[fst, snd]: puzzleInfo) {
+            std::cout << fst << ". Day " << fst << " (" << snd.title << ")" << std::endl;
+            if (fst == puzzleInfo.size()) {
                 std::cout << std::endl;
             }
         }
 
-        int day = promptForDay(puzzleInfo);
+        const int day = promptForDay(puzzleInfo);
         if (day == -1) {
-            return 0;
+            return 1;
         }
 
         auto session = Session::init(".session");
@@ -60,6 +61,7 @@ int main() {
         solvePuzzle(day, puzzleService);
     } catch (const std::exception &e) {
         std::cerr << "Error: " << e.what() << std::endl;
+        return -1;
     }
 
     return 0;
