@@ -1,7 +1,12 @@
 #include "puzzle/day03_puzzle.hpp"
 #include "util/string_utils.hpp"
 
+
+#include <iostream>
+
 int Day03Puzzle::solvePartOne(std::string &puzzle_input) {
+    std::cout << "Hello World" << std::endl;
+
     return 0;
 }
 

@@ -1,8 +1,9 @@
-#include <iostream>
-#include <limits>
-#include "session/session.hpp"
 #include "puzzle/puzzle_registry.hpp"
 #include "service/puzzle_service.hpp"
+#include "session/session.hpp"
+#include "util/time_utils.hpp"
+#include <iostream>
+#include <limits>
 
 int promptForDay(const std::map<int, PuzzleInfo> &puzzleInfo) {
     int day;
@@ -16,7 +17,8 @@ int promptForDay(const std::map<int, PuzzleInfo> &puzzleInfo) {
         }
 
         if (std::cin.fail() || !puzzleInfo.contains(day)) {
-            std::cout << "The day you entered is invalid, please try again." << std::endl << std::endl;
+            std::cout << "The day you entered is invalid, please try again." << std::endl
+                      << std::endl;
             std::cin.clear();
             std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
             continue;
@@ -33,8 +35,15 @@ void solvePuzzle(const int day, PuzzleService &puzzleService) {
     const auto puzzle = PuzzleRegistry::getInstance().createPuzzle(day, puzzleService);
     auto puzzleInput = puzzleService.readPuzzleInput(day);
 
-    std::cout << "Part one: " << puzzle->solvePartOne(puzzleInput) << std::endl;
-    std::cout << "Part two: " << puzzle->solvePartTwo(puzzleInput) << std::endl;
+    const auto [partOneResult, partOneTime] = TimeUtils::measureExecutionTime([&] {
+        return puzzle->solvePartOne(puzzleInput);
+    });
+    std::cout << "Part One: " << partOneResult << ", took " << partOneTime << " milliseconds" << std::endl;
+
+    const auto [partTwoResult, partTwoTime] = TimeUtils::measureExecutionTime([&] {
+        return puzzle->solvePartTwo(puzzleInput);
+    });
+    std::cout << "Part Two: " << partTwoResult << ", took " << partTwoTime << " milliseconds" << std::endl;
 }
 
 int main() {
