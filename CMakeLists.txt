@@ -28,6 +28,7 @@ add_executable(aoc_2023 main.cpp
         include/puzzle/puzzle_registry.hpp src/puzzle/puzzle_registry.cpp
         include/puzzle/day01_puzzle.hpp src/puzzle/day01_puzzle.cpp
         include/puzzle/day02_puzzle.hpp src/puzzle/day02_puzzle.cpp
+        include/puzzle/day03_puzzle.hpp src/puzzle/day03_puzzle.cpp
         include/puzzle/day07_puzzle.hpp src/puzzle/day07_puzzle.cpp)
 add_executable(aoc_2023_test
         tests/service/puzzle_service_mock.hpp
