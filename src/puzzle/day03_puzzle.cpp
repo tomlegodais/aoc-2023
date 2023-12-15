@@ -19,6 +19,24 @@ bool Day03Puzzle::isAdjacent(const std::vector<std::string> &schematic, const in
     return false;
 }
 
+int Day03Puzzle::findPartNumber(const std::vector<std::string> &schematic, const int x, int y) {
+    if (x >= 0 && x < schematic.size() && y >= 0 && y < schematic[0].size() && isdigit(schematic[x][y])) {
+        while (y > 0 && isdigit(schematic[x][y - 1])) {
+            y--;
+        }
+
+        std::string number_str;
+        while (y < schematic[x].size() && isdigit(schematic[x][y])) {
+            number_str += schematic[x][y];
+            y++;
+        }
+
+        return std::stoi(number_str);
+    }
+
+    return -1;
+}
+
 int Day03Puzzle::solvePartOne(std::vector<std::string> &puzzle_input) {
     int total_sum = 0;
 
@@ -42,24 +60,6 @@ int Day03Puzzle::solvePartOne(std::vector<std::string> &puzzle_input) {
     }
 
     return total_sum;
-}
-
-int Day03Puzzle::findPartNumber(const std::vector<std::string> &schematic, const int x, int y) {
-    if (x >= 0 && x < schematic.size() && y >= 0 && y < schematic[0].size() && isdigit(schematic[x][y])) {
-        while (y > 0 && isdigit(schematic[x][y - 1])) {
-            y--;
-        }
-
-        std::string number_str;
-        while (y < schematic[x].size() && isdigit(schematic[x][y])) {
-            number_str += schematic[x][y];
-            y++;
-        }
-
-        return std::stoi(number_str);
-    }
-
-    return -1;
 }
 
 int Day03Puzzle::solvePartTwo(std::vector<std::string> &puzzle_input) {
