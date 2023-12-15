@@ -11,7 +11,7 @@ public:
 
     virtual ~DayPuzzle() = default;
 
-    virtual int solvePartOne(std::string &puzzle_input) = 0;
+    virtual int solvePartOne(std::vector<std::string> &puzzle_input) = 0;
 
-    virtual int solvePartTwo(std::string &puzzle_input) = 0;
+    virtual int solvePartTwo(std::vector<std::string> &puzzle_input) = 0;
 };

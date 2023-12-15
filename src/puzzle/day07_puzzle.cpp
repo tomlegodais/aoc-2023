@@ -138,9 +138,9 @@ public:
     }
 };
 
-int solveWithStrategy(const std::string &puzzle_input, const CardMappingStrategy &strategy) {
+int solveWithStrategy(const std::vector<std::string> &puzzle_input, const CardMappingStrategy &strategy) {
     std::vector<PokerHand> poker_hands;
-    for (const auto &line: StringUtils::splitOnNewline(puzzle_input)) {
+    for (const auto &line: puzzle_input) {
         poker_hands.emplace_back(line, strategy);
     }
 
@@ -154,12 +154,12 @@ int solveWithStrategy(const std::string &puzzle_input, const CardMappingStrategy
     return total;
 }
 
-int Day07Puzzle::solvePartOne(std::string &puzzle_input) {
+int Day07Puzzle::solvePartOne(std::vector<std::string> &puzzle_input) {
     const PartOneMappingStrategy strategy;
     return solveWithStrategy(puzzle_input, strategy);
 }
 
-int Day07Puzzle::solvePartTwo(std::string &puzzle_input) {
+int Day07Puzzle::solvePartTwo(std::vector<std::string> &puzzle_input) {
     const PartTwoMappingStrategy strategy;
     return solveWithStrategy(puzzle_input, strategy);
 }

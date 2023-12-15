@@ -1,6 +1,7 @@
 #pragma once
 
 #include "session/session.hpp"
+#include <vector>
 
 class PuzzleService {
 public:
@@ -8,7 +9,7 @@ public:
 
     virtual ~PuzzleService() = default;
 
-    virtual std::string readPuzzleInput(int day);
+    virtual std::vector<std::string> readPuzzleInput(int day);
 
 private:
     Session &session_;

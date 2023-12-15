@@ -50,11 +50,10 @@ bool Day02Puzzle::isGroupValid(const std::string &group) {
 }
 
 
-int Day02Puzzle::solvePartOne(std::string &puzzle_input) {
-    const auto &lines = StringUtils::splitOnNewline(puzzle_input);
+int Day02Puzzle::solvePartOne(std::vector<std::string> &puzzle_input) {
     int sum = 0;
 
-    for (const auto &line: lines) {
+    for (const auto &line: puzzle_input) {
         auto groups = parseGroups(line);
         bool possible = true;
 
@@ -65,7 +64,7 @@ int Day02Puzzle::solvePartOne(std::string &puzzle_input) {
             break;
         }
 
-        const int id = static_cast<int>(&line - &lines[0] + 1);
+        const int id = static_cast<int>(&line - &puzzle_input[0] + 1);
         if (possible) sum += id;
     }
 
@@ -84,10 +83,10 @@ std::vector<int> Day02Puzzle::getHighestValues(const std::map<std::string, std::
     return highest_values;
 }
 
-int Day02Puzzle::solvePartTwo(std::string &puzzle_input) {
+int Day02Puzzle::solvePartTwo(std::vector<std::string> &puzzle_input) {
     int sum = 0;
 
-    for (const auto &line: StringUtils::splitOnNewline(puzzle_input)) {
+    for (const auto &line: puzzle_input) {
         auto groups = parseGroups(line);
         std::map<std::string, std::vector<int>> total_counts;
 

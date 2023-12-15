@@ -2,11 +2,10 @@
 #include "util/string_utils.hpp"
 #include <algorithm>
 
-int Day01Puzzle::solvePartOne(std::string &puzzle_input) {
-    const auto lines = StringUtils::splitOnNewline(puzzle_input);
+int Day01Puzzle::solvePartOne(std::vector<std::string> &puzzle_input) {
     int sum = 0;
 
-    for (const auto &line: lines) {
+    for (const auto &line: puzzle_input) {
         int first_digit = 0, last_digit = 0;
         for (const auto &c: line) {
             if (std::isdigit(c)) {
@@ -21,8 +20,7 @@ int Day01Puzzle::solvePartOne(std::string &puzzle_input) {
     return sum;
 }
 
-int Day01Puzzle::solvePartTwo(std::string &puzzle_input) {
-    const auto lines = StringUtils::splitOnNewline(puzzle_input);
+int Day01Puzzle::solvePartTwo(std::vector<std::string> &puzzle_input) {
     const std::map<std::string, char> number_mapping = {
             {"one", 1},
             {"two", 2},
@@ -36,7 +34,7 @@ int Day01Puzzle::solvePartTwo(std::string &puzzle_input) {
     };
 
     int sum = 0;
-    for (const auto &line: lines) {
+    for (const auto &line: puzzle_input) {
         std::vector<std::pair<int, int>> indices;
         for (auto i = 0; i < line.length(); i++) {
             if (std::isalpha(line[i])) {
