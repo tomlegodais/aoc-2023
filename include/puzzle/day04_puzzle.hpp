@@ -7,9 +7,9 @@ class [[maybe_unused]] Day04Puzzle final : public DayPuzzle {
 public:
     explicit Day04Puzzle(const PuzzleService &puzzle_service) : DayPuzzle(puzzle_service) {}
 
-    int solvePartOne(std::string &puzzle_input) override;
+    int solvePartOne(std::vector<std::string> &puzzle_input) override;
 
-    int solvePartTwo(std::string &puzzle_input) override;
+    int solvePartTwo(std::vector<std::string> &puzzle_input) override;
 
 private:
     static std::pair<std::vector<int>, std::vector<int>> extractNumbers(const std::string &str);

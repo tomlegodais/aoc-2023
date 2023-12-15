@@ -1,7 +1,6 @@
 #include "puzzle/day04_puzzle.hpp"
 #include "util/string_utils.hpp"
 #include <algorithm>
-#include <iostream>
 #include <sstream>
 
 std::pair<std::vector<int>, std::vector<int>> Day04Puzzle::extractNumbers(const std::string &str) {
@@ -33,11 +32,10 @@ std::pair<std::vector<int>, std::vector<int>> Day04Puzzle::extractNumbers(const 
     return {left_numbers, right_numbers};
 }
 
-int Day04Puzzle::solvePartOne(std::string &puzzle_input) {
-    auto const lines = StringUtils::splitOnNewline(puzzle_input);
+int Day04Puzzle::solvePartOne(std::vector<std::string> &puzzle_input) {
     int total_sum = 0;
 
-    for (const auto &line: lines) {
+    for (const auto &line: puzzle_input) {
         auto [left_numbers, right_numbers] = extractNumbers(line);
 
         std::vector<int> left_sort = left_numbers,
@@ -62,7 +60,7 @@ int Day04Puzzle::solvePartOne(std::string &puzzle_input) {
     return total_sum;
 }
 
-int Day04Puzzle::solvePartTwo(std::string &puzzle_input) {
+int Day04Puzzle::solvePartTwo(std::vector<std::string> &puzzle_input) {
     return 0;
 }
 
