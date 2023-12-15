@@ -9,15 +9,16 @@ class Day07PuzzleTest : public testing::Test {
 protected:
     Session dummy_session_;
     NiceMock<PuzzleServiceMock> puzzle_service_mock_;
-    std::string puzzle_input_;
+    std::vector<std::string> puzzle_input_;
 
     Day07PuzzleTest() : dummy_session_(Session::fromValue("dummy")),
                         puzzle_service_mock_(dummy_session_) {
-        puzzle_input_ = "32T3K 765\n"
-                        "T55J5 684\n"
-                        "KK677 28\n"
-                        "KTJJT 220\n"
-                        "QQQJA 483";
+        puzzle_input_ = {
+                "32T3K 765",
+                "T55J5 684",
+                "KK677 28",
+                "KTJJT 220",
+                "QQQJA 483"};
     }
 };
 

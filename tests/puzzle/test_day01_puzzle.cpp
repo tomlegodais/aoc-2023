@@ -16,22 +16,22 @@ protected:
 
 TEST_F(Day01PuzzleTest, SolvePartOne) {
     Day01Puzzle puzzle(puzzle_service_mock_);
-    std::string puzzle_input = "1abc2\n"
-                               "pqr3stu8vwx\n"
-                               "a1b2c3d4e5f\n"
-                               "treb7uchet";
+    std::vector<std::string> puzzle_input = {"1abc2",
+                                             "pqr3stu8vwx",
+                                             "a1b2c3d4e5f",
+                                             "treb7uchet"};
     EXPECT_EQ(142, puzzle.solvePartOne(puzzle_input));
 }
 
 TEST_F(Day01PuzzleTest, SolvePartTwo) {
     Day01Puzzle puzzle(puzzle_service_mock_);
-    std::string puzzle_input = "two1nine\n"
-                               "eightwothree\n"
-                               "abcone2threexyz\n"
-                               "xtwone3four\n"
-                               "4nineeightseven2\n"
-                               "zoneight234\n"
-                               "7pqrstsixteen";
+    std::vector<std::string> puzzle_input = {"two1nine",
+                                             "eightwothree",
+                                             "abcone2threexyz",
+                                             "xtwone3four",
+                                             "4nineeightseven2",
+                                             "zoneight234",
+                                             "7pqrstsixteen"};
     EXPECT_EQ(281, puzzle.solvePartTwo(puzzle_input));
 }
 

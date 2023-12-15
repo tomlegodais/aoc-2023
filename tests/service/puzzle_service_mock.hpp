@@ -8,5 +8,5 @@ class PuzzleServiceMock : public PuzzleService {
 public:
     explicit PuzzleServiceMock(Session session) : PuzzleService(session) {}
 
-    MOCK_METHOD(std::string, readPuzzleInput, (int), (override));
+    MOCK_METHOD(std::vector<std::string>, readPuzzleInput, (int), (override));
 };

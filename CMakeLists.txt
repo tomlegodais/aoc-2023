@@ -35,11 +35,14 @@ add_executable(aoc_2023 main.cpp
 add_executable(aoc_2023_test
         tests/service/puzzle_service_mock.hpp
         tests/puzzle/test_day01_puzzle.cpp tests/puzzle/test_day02_puzzle.cpp
+        tests/puzzle/test_day03_puzzle.cpp tests/puzzle/test_day04_puzzle.cpp
         tests/puzzle/test_day07_puzzle.cpp
         include/service/puzzle_service.hpp src/service/puzzle_service.cpp
         include/util/string_utils.hpp src/util/string_utils.cpp
         include/puzzle/day01_puzzle.hpp src/puzzle/day01_puzzle.cpp
         include/puzzle/day02_puzzle.hpp src/puzzle/day02_puzzle.cpp
+        include/puzzle/day03_puzzle.hpp src/puzzle/day03_puzzle.cpp
+        include/puzzle/day04_puzzle.hpp src/puzzle/day04_puzzle.cpp
         include/puzzle/day07_puzzle.hpp src/puzzle/day07_puzzle.cpp)
 
 target_link_libraries(aoc_2023 PRIVATE cpr::cpr)
