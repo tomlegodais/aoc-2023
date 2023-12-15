@@ -1,7 +1,7 @@
 #include "puzzle/puzzle_registry.hpp"
 #include "service/puzzle_service.hpp"
 #include "session/session.hpp"
-#include "util/time_utils.hpp"
+#include "util/utils.hpp"
 #include <iostream>
 #include <limits>
 
@@ -35,12 +35,12 @@ void solvePuzzle(const int day, PuzzleService &puzzleService) {
     const auto puzzle = PuzzleRegistry::getInstance().createPuzzle(day, puzzleService);
     auto puzzleInput = puzzleService.readPuzzleInput(day);
 
-    const auto [partOneResult, partOneTime] = TimeUtils::measureExecutionTime([&] {
+    const auto [partOneResult, partOneTime] = utils::measureExecutionTime([&] {
         return puzzle->solvePartOne(puzzleInput);
     });
     std::cout << "Part One: " << partOneResult << ", took " << partOneTime << " milliseconds" << std::endl;
 
-    const auto [partTwoResult, partTwoTime] = TimeUtils::measureExecutionTime([&] {
+    const auto [partTwoResult, partTwoTime] = utils::measureExecutionTime([&] {
         return puzzle->solvePartTwo(puzzleInput);
     });
     std::cout << "Part Two: " << partTwoResult << ", took " << partTwoTime << " milliseconds" << std::endl;

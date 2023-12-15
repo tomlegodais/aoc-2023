@@ -1,5 +1,5 @@
 #include "service/puzzle_service.hpp"
-#include "util/string_utils.hpp"
+#include "util/utils.hpp"
 #include <cpr/cpr.h>
 
 std::vector<std::string> PuzzleService::readPuzzleInput(const int day) {
@@ -12,5 +12,5 @@ std::vector<std::string> PuzzleService::readPuzzleInput(const int day) {
                                  "Please check if your session value is correct.");
     }
 
-    return StringUtils::splitOnNewline(response.text);
+    return utils::splitOnNewline(response.text);
 }

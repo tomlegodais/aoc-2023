@@ -1,5 +1,4 @@
 #include "puzzle/day01_puzzle.hpp"
-#include "util/string_utils.hpp"
 #include <algorithm>
 
 int Day01Puzzle::solvePartOne(std::vector<std::string> &puzzle_input) {

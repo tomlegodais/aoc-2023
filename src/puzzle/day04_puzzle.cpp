@@ -1,5 +1,4 @@
 #include "puzzle/day04_puzzle.hpp"
-#include "util/string_utils.hpp"
 #include <algorithm>
 #include <sstream>
 

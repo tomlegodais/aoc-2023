@@ -1,5 +1,4 @@
 #include "puzzle/day02_puzzle.hpp"
-#include "util/string_utils.hpp"
 #include <algorithm>
 #include <map>
 #include <numeric>
@@ -49,6 +48,17 @@ bool Day02Puzzle::isGroupValid(const std::string &group) {
     });
 }
 
+std::vector<int> Day02Puzzle::getHighestValues(const std::map<std::string, std::vector<int>> &total_counts) {
+    std::vector<int> highest_values;
+
+    for (const auto &counts: total_counts | std::views::values) {
+        if (!counts.empty()) {
+            highest_values.push_back(*std::ranges::max_element(counts));
+        }
+    }
+
+    return highest_values;
+}
 
 int Day02Puzzle::solvePartOne(std::vector<std::string> &puzzle_input) {
     int sum = 0;
@@ -69,18 +79,6 @@ int Day02Puzzle::solvePartOne(std::vector<std::string> &puzzle_input) {
     }
 
     return sum;
-}
-
-std::vector<int> Day02Puzzle::getHighestValues(const std::map<std::string, std::vector<int>> &total_counts) {
-    std::vector<int> highest_values;
-
-    for (const auto &counts: total_counts | std::views::values) {
-        if (!counts.empty()) {
-            highest_values.push_back(*std::ranges::max_element(counts));
-        }
-    }
-
-    return highest_values;
 }
 
 int Day02Puzzle::solvePartTwo(std::vector<std::string> &puzzle_input) {

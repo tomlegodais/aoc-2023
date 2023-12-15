@@ -1,5 +1,4 @@
 #include "puzzle/day03_puzzle.hpp"
-#include "util/string_utils.hpp"
 #include <iostream>
 #include <set>
 

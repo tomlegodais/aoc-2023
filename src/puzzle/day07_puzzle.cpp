@@ -1,6 +1,5 @@
 #include "puzzle/day07_puzzle.hpp"
 #include "puzzle/puzzle_registrar.hpp"
-#include "util/string_utils.hpp"
 #include <algorithm>
 #include <ranges>
 
