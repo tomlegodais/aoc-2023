@@ -12,5 +12,7 @@ public:
     int solvePartTwo(std::string &puzzle_input) override;
 
 private:
+    static std::pair<std::vector<int>, std::vector<int>> extractNumbers(const std::string &str);
+
     [[maybe_unused]] static PuzzleRegistrar<4, Day04Puzzle> registrar_;
 };

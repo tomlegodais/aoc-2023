@@ -79,21 +79,21 @@ class PokerHand : public Hand {
 
     [[nodiscard]] HandType determineHandType() const {
         std::unordered_map<char, int> frequency;
-        int jokerCount = 0;
+        int joker_count = 0;
         for (const auto &card: cards_) {
             if (card.value_ == "Joker") {
-                jokerCount++;
+                joker_count++;
             } else {
                 frequency[card.value_[0]]++;
             }
         }
 
-        for (int j = 0; j < jokerCount; ++j) {
+        for (int j = 0; j < joker_count; ++j) {
 
-            if (auto bestUse = std::ranges::max_element(frequency,
-                                                        [](const auto &a, const auto &b) { return a.second < b.second; });
-                bestUse != frequency.end()) {
-                bestUse->second++;
+            if (auto best_use = std::ranges::max_element(frequency,
+                                                         [](const auto &a, const auto &b) { return a.second < b.second; });
+                best_use != frequency.end()) {
+                best_use->second++;
             } else {
                 frequency['*'] = 1;
             }
