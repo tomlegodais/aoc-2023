@@ -24,6 +24,7 @@ std::pair<std::vector<int>, std::vector<int>> Day04Puzzle::extractNumbers(const 
         int num;
         while (iss >> num) numbers.push_back(num);
 
+        std::ranges::sort(numbers);
         return numbers;
     };
 
@@ -38,21 +39,12 @@ int Day04Puzzle::solvePartOne(std::vector<std::string> &puzzle_input) {
     for (const auto &line: puzzle_input) {
         auto [left_numbers, right_numbers] = extractNumbers(line);
 
-        std::vector<int> left_sort = left_numbers,
-                         right_sort = right_numbers;
-
-        std::ranges::sort(left_sort);
-        std::ranges::sort(right_sort);
-
         std::vector<int> intersection;
-        std::ranges::set_intersection(left_sort, right_sort,
+        std::ranges::set_intersection(left_numbers, right_numbers,
                                       std::back_inserter(intersection));
 
         auto const match_count = intersection.size();
-        int points = 0;
-        if (match_count != 0) {
-            points = 1 << match_count - 1;
-        }
+        const int points = match_count != 0 ? 1 << match_count - 1 : 0;
 
         total_sum += points;
     }
