@@ -3,11 +3,11 @@
 #include <iostream>
 #include <set>
 
-bool isSymbol(const char c) {
+bool Day03Puzzle::isSymbol(const char c) {
     return !isdigit(c) && c != '.';
 }
 
-bool isAdjacent(const std::vector<std::string> &schematic, const int x, const int y) {
+bool Day03Puzzle::isAdjacent(const std::vector<std::string> &schematic, const int x, const int y) {
     for (int dx = -1; dx <= 1; dx++) {
         for (int dy = -1; dy <= 1; dy++) {
             const int new_x = x + dx;
@@ -44,7 +44,7 @@ int Day03Puzzle::solvePartOne(std::vector<std::string> &puzzle_input) {
     return total_sum;
 }
 
-int findPartNumber(const std::vector<std::string> &schematic, const int x, int y) {
+int Day03Puzzle::findPartNumber(const std::vector<std::string> &schematic, const int x, int y) {
     if (x >= 0 && x < schematic.size() && y >= 0 && y < schematic[0].size() && isdigit(schematic[x][y])) {
         while (y > 0 && isdigit(schematic[x][y - 1])) {
             y--;
