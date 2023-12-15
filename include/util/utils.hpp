@@ -1,7 +1,10 @@
 #pragma once
 
 #include <chrono>
+#include <sstream>
+#include <string>
 #include <utility>
+#include <vector>
 
 namespace utils {
     template<typename Func>
