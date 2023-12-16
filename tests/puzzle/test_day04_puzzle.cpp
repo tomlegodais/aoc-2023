@@ -30,5 +30,5 @@ TEST_F(Day04PuzzleTest, SolvePartOne) {
 
 TEST_F(Day04PuzzleTest, SolvePartTwo) {
     Day04Puzzle puzzle(puzzle_service_mock_);
-    EXPECT_EQ(0, puzzle.solvePartTwo(puzzle_input_));
+    EXPECT_EQ(30, puzzle.solvePartTwo(puzzle_input_));
 }
