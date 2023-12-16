@@ -3,6 +3,7 @@
 #include "session/session.hpp"
 #include "util/utils.hpp"
 #include <iostream>
+#include <limits>
 #include <set>
 
 using Puzzles = std::tuple<
@@ -15,7 +16,9 @@ void printPuzzle() {
 
 template<std::size_t I = 0, typename... Tp>
 std::enable_if_t<I == sizeof...(Tp), void>
-listPuzzle(std::tuple<Tp...> &) {}
+listPuzzle(std::tuple<Tp...> &) {
+    std::cout << std::endl;
+}
 
 template<std::size_t I = 0, typename... Tp>
         std::enable_if_t < I<sizeof...(Tp)> listPuzzle(std::tuple<Tp...> &t) {
@@ -37,6 +40,30 @@ template<std::size_t I = 0, typename... Tp>
     return days;
 }
 
+int promptForDay(const std::set<int> &days) {
+    int day;
+
+    while (true) {
+        std::cout << "Enter the day you would like to solve (-1 to exit): ";
+        std::cin >> day;
+
+        if (day == -1) {
+            return -1;
+        }
+
+        if (std::cin.fail() || !days.contains(day)) {
+            std::cout << "The day you entered is invalid, please try again." << std::endl
+                      << std::endl;
+
+            std::cin.clear();
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+            continue;
+        }
+
+        return day;
+    }
+}
+
 template<int Day>
 void solvePuzzle(PuzzleService &puzzle_service) {
     auto puzzleInput = puzzle_service.readPuzzleInput(Day);
@@ -56,12 +83,16 @@ int main() {
         Puzzles puzzles;
         listPuzzle(puzzles);
 
-        // TODO: Implement a way to select a day
+        const auto puzzleDays = getPuzzleDays(puzzles);
+        const int day = promptForDay(puzzleDays);
+        if (day == -1) {
+            return 0;
+        }
 
         auto session = Session::init(".session");
         auto puzzleService = PuzzleService(session);
 
-        solvePuzzle<1>(puzzleService);
+        // solvePuzzle<1>(puzzleService);
     } catch (const std::exception &e) {
         std::cerr << "Error: " << e.what() << std::endl;
         return -1;

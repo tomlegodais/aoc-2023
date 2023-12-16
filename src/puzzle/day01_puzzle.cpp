@@ -9,5 +9,5 @@ int DayPuzzle<1>::solvePartOne(PuzzleService &puzzle_service, const std::vector<
 
 template<>
 const char *DayPuzzle<1>::getTitle() {
-    return "My Title";
+    return "Trebuchet?!";
 }
