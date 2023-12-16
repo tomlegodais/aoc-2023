@@ -1,17 +1,20 @@
 #pragma once
 
 #include "service/puzzle_service.hpp"
+#include <boost/preprocessor/repetition/repeat.hpp>
+#include <stdexcept>
 
+template<int Day>
 class DayPuzzle {
-protected:
-    PuzzleService puzzle_service_;
-
 public:
-    explicit DayPuzzle(const PuzzleService &puzzle_service) : puzzle_service_(puzzle_service) {}
-
-    virtual ~DayPuzzle() = default;
-
-    virtual int solvePartOne(std::vector<std::string> &puzzle_input) = 0;
-
-    virtual int solvePartTwo(std::vector<std::string> &puzzle_input) = 0;
+    static int solvePartOne(PuzzleService &puzzle_service, const std::vector<std::string> &puzzle_input) {
+        static_assert(Day != Day, "DayPuzzle::solvePartOne not implemented for this day.");
+        return 0;
+    }
 };
+
+#define DEFINE_DAY_PUZZLE(z, n, data) \
+    template<>                        \
+    int DayPuzzle<n + 1>::solvePartOne(PuzzleService &, const std::vector<std::string> &);
+
+BOOST_PP_REPEAT(4, DEFINE_DAY_PUZZLE, ~)
