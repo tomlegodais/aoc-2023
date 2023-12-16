@@ -31,7 +31,7 @@ run:
 	@$(BINARY)
 
 test: build
-	@cd build && ctest
+	@cd build && ctest --extra-verbose
 
 clean:
 	@$(RMDIR_CMD)

@@ -11,10 +11,12 @@ foreach (CONFIG_TYPE IN LISTS CMAKE_CONFIGURATION_TYPES CMAKE_BUILD_TYPE)
     set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY_${CONFIG_TYPE_UPPER} ${CMAKE_BINARY_DIR}/lib)
 endforeach ()
 
+file(COPY ${CMAKE_SOURCE_DIR}/tests/data/ DESTINATION ${CMAKE_BINARY_DIR}/tests/data/)
 enable_testing()
 
 find_package(GTest CONFIG REQUIRED)
 find_package(cpr CONFIG REQUIRED)
+find_package(nlohmann_json CONFIG REQUIRED)
 
 include_directories(${PROJECT_SOURCE_DIR}/include)
 include_directories(${PROJECT_SOURCE_DIR}/tests)
@@ -33,9 +35,8 @@ add_executable(aoc_2023 main.cpp
         include/puzzle/day07_puzzle.hpp src/puzzle/day07_puzzle.cpp)
 add_executable(aoc_2023_test
         tests/service/puzzle_service_mock.hpp
-        tests/puzzle/test_day01_puzzle.cpp tests/puzzle/test_day02_puzzle.cpp
-        tests/puzzle/test_day03_puzzle.cpp tests/puzzle/test_day04_puzzle.cpp
-        tests/puzzle/test_day07_puzzle.cpp
+        tests/puzzle/test_day_puzzle.cpp include/puzzle/puzzle_registrar.hpp
+        include/puzzle/puzzle_registry.hpp src/puzzle/puzzle_registry.cpp
         include/service/puzzle_service.hpp src/service/puzzle_service.cpp
         include/puzzle/day01_puzzle.hpp src/puzzle/day01_puzzle.cpp
         include/puzzle/day02_puzzle.hpp src/puzzle/day02_puzzle.cpp
@@ -44,9 +45,11 @@ add_executable(aoc_2023_test
         include/puzzle/day07_puzzle.hpp src/puzzle/day07_puzzle.cpp)
 
 target_link_libraries(aoc_2023 PRIVATE cpr::cpr)
+
 target_link_libraries(aoc_2023_test PRIVATE
         cpr::cpr
         GTest::gtest GTest::gtest_main
-        GTest::gmock GTest::gmock_main)
+        GTest::gmock GTest::gmock_main
+        nlohmann_json::nlohmann_json)
 
 gtest_discover_tests(aoc_2023_test)
