@@ -18,15 +18,6 @@ struct PuzzleTuple<std::integer_sequence<int, Days...>> {
 using PuzzleDays = std::make_integer_sequence<int, 7>;
 using Puzzles = PuzzleTuple<PuzzleDays>::type;
 
-// using Puzzles = std::tuple<
-//         DayPuzzle<1>,
-//         DayPuzzle<2>,
-//         DayPuzzle<3>,
-//         DayPuzzle<4>,
-//         DayPuzzle<5>,
-//         DayPuzzle<6>,
-//         DayPuzzle<7>>;
-
 template<typename Puzzle>
 void printPuzzle() {
     std::cout << Puzzle::day << ". " << Puzzle::getTitle() << std::endl;
