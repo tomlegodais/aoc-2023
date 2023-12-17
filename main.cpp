@@ -118,15 +118,7 @@ int main() {
         std::cout << "Advent of Code 2023" << std::endl;
         std::cout << "===================" << std::endl;
 
-        // Puzzles puzzles;
-        auto puzzles = std::make_tuple(
-                DayPuzzle<1>(),
-                DayPuzzle<2>(),
-                DayPuzzle<3>(),
-                DayPuzzle<4>(),
-                DayPuzzle<5>(),
-                DayPuzzle<6>(),
-                DayPuzzle<7>());
+        Puzzles puzzles;
         listPuzzle(puzzles);
 
         const auto puzzle_days = getPuzzleDays(puzzles);
