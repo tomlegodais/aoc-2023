@@ -38,8 +38,8 @@ listPuzzle(std::tuple<Tp...> &) {
 }
 
 template<std::size_t I = 0, typename... Tp>
-std::enable_if_t < I<sizeof...(Tp)>
-listPuzzle(std::tuple<Tp...> &t) {
+        std::enable_if_t < I<sizeof...(Tp)>
+                           listPuzzle(std::tuple<Tp...> &t) {
     printPuzzle<std::tuple_element_t<I, std::tuple<Tp...>>>();
     listPuzzle<I + 1, Tp...>(t);
 }
@@ -51,8 +51,8 @@ getPuzzleDays(std::tuple<Tp...> &) {
 }
 
 template<std::size_t I = 0, typename... Tp>
-constexpr std::enable_if_t < I<sizeof...(Tp), std::set<int>>
-getPuzzleDays(std::tuple<Tp...> &t) {
+        constexpr std::enable_if_t < I<sizeof...(Tp), std::set<int>>
+                                     getPuzzleDays(std::tuple<Tp...> &t) {
     std::set<int> days = getPuzzleDays<I + 1>(t);
     days.insert(std::tuple_element_t<I, std::tuple<Tp...>>::day);
     return days;
@@ -117,7 +117,15 @@ int main() {
         std::cout << "Advent of Code 2023" << std::endl;
         std::cout << "===================" << std::endl;
 
-        Puzzles puzzles;
+        // Puzzles puzzles;
+        auto puzzles = std::make_tuple(
+                DayPuzzle<1>(),
+                DayPuzzle<2>(),
+                DayPuzzle<3>(),
+                DayPuzzle<4>(),
+                DayPuzzle<5>(),
+                DayPuzzle<6>(),
+                DayPuzzle<7>());
         listPuzzle(puzzles);
 
         const auto puzzle_days = getPuzzleDays(puzzles);
