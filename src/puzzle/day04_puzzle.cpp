@@ -1,4 +1,4 @@
-#include "puzzle/day04_puzzle.hpp"
+#include "puzzle/day_puzzle.hpp"
 #include <algorithm>
 #include <queue>
 #include <sstream>
@@ -17,7 +17,7 @@ struct ScratchCard {
     }
 };
 
-std::pair<std::vector<int>, std::vector<int>> Day04Puzzle::extractNumbers(const std::string &str) {
+std::pair<std::vector<int>, std::vector<int>> extractNumbers(const std::string &str) {
     const auto start_of_numbers = str.find(':');
     if (start_of_numbers == std::string::npos) {
         return {};
@@ -47,7 +47,8 @@ std::pair<std::vector<int>, std::vector<int>> Day04Puzzle::extractNumbers(const 
     return {left_numbers, right_numbers};
 }
 
-int Day04Puzzle::solvePartOne(std::vector<std::string> &puzzle_input) {
+template<>
+int DayPuzzle<4>::solvePartOne(PuzzleService &, const std::vector<std::string> &puzzle_input) {
     std::vector<ScratchCard> scratch_cards;
     for (int card_id = 1; card_id <= puzzle_input.size(); ++card_id) {
         auto [left_numbers, right_numbers] = extractNumbers(puzzle_input[card_id - 1]);
@@ -63,7 +64,8 @@ int Day04Puzzle::solvePartOne(std::vector<std::string> &puzzle_input) {
     return total_sum;
 }
 
-int Day04Puzzle::solvePartTwo(std::vector<std::string> &puzzle_input) {
+template<>
+int DayPuzzle<4>::solvePartTwo(PuzzleService &, const std::vector<std::string> &puzzle_input) {
     std::vector<ScratchCard> scratch_cards;
     std::queue<ScratchCard> card_queue;
 
@@ -90,4 +92,7 @@ int Day04Puzzle::solvePartTwo(std::vector<std::string> &puzzle_input) {
     return total_scratch_cards;
 }
 
-[[maybe_unused]] PuzzleRegistrar<4, Day04Puzzle> Day04Puzzle::registrar_("Scratchcards");
+template<>
+const char *DayPuzzle<4>::getTitle() {
+    return "Scratchcards";
+}

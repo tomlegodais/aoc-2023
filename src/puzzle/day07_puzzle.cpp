@@ -1,7 +1,7 @@
-#include "puzzle/day07_puzzle.hpp"
-#include "puzzle/puzzle_registrar.hpp"
+#include "puzzle/day_puzzle.hpp"
 #include <algorithm>
 #include <ranges>
+#include <unordered_map>
 
 class CardMappingStrategy {
 protected:
@@ -153,15 +153,19 @@ int solveWithStrategy(const std::vector<std::string> &puzzle_input, const CardMa
     return total;
 }
 
-int Day07Puzzle::solvePartOne(std::vector<std::string> &puzzle_input) {
+template<>
+int DayPuzzle<7>::solvePartOne(PuzzleService &, const std::vector<std::string> &puzzle_input) {
     const PartOneMappingStrategy strategy;
     return solveWithStrategy(puzzle_input, strategy);
 }
 
-int Day07Puzzle::solvePartTwo(std::vector<std::string> &puzzle_input) {
+template<>
+int DayPuzzle<7>::solvePartTwo(PuzzleService &, const std::vector<std::string> &puzzle_input) {
     const PartTwoMappingStrategy strategy;
     return solveWithStrategy(puzzle_input, strategy);
 }
 
-
-[[maybe_unused]] PuzzleRegistrar<7, Day07Puzzle> Day07Puzzle::registrar_("Camel Cards");
+template<>
+const char *DayPuzzle<7>::getTitle() {
+    return "Scratchcards";
+}

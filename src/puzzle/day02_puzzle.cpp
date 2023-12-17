@@ -1,4 +1,4 @@
-#include "puzzle/day02_puzzle.hpp"
+#include "puzzle/day_puzzle.hpp"
 #include <algorithm>
 #include <map>
 #include <numeric>
@@ -10,7 +10,7 @@ const std::map<std::string, int> color_mapping = {
         {"green", 13},
         {"blue", 14}};
 
-std::vector<std::string> Day02Puzzle::parseGroups(const std::string &line) {
+std::vector<std::string> parseGroups(const std::string &line) {
     std::istringstream iss(line.substr(line.find(':') + 1));
     std::vector<std::string> groups;
     std::string group;
@@ -22,7 +22,7 @@ std::vector<std::string> Day02Puzzle::parseGroups(const std::string &line) {
     return groups;
 }
 
-std::map<std::string, int> Day02Puzzle::countColors(const std::string &group) {
+std::map<std::string, int> countColors(const std::string &group) {
     std::map<std::string, int> color_counts;
     std::istringstream group_stream(group);
     std::string pair;
@@ -39,7 +39,7 @@ std::map<std::string, int> Day02Puzzle::countColors(const std::string &group) {
     return color_counts;
 }
 
-bool Day02Puzzle::isGroupValid(const std::string &group) {
+bool isGroupValid(const std::string &group) {
     const auto &color_counts = countColors(group);
     return std::ranges::all_of(color_mapping.begin(), color_mapping.end(), [&color_counts](const auto &pair) {
         const auto &[color, max] = pair;
@@ -48,7 +48,7 @@ bool Day02Puzzle::isGroupValid(const std::string &group) {
     });
 }
 
-std::vector<int> Day02Puzzle::getHighestValues(const std::map<std::string, std::vector<int>> &total_counts) {
+std::vector<int> getHighestValues(const std::map<std::string, std::vector<int>> &total_counts) {
     std::vector<int> highest_values;
 
     for (const auto &counts: total_counts | std::views::values) {
@@ -60,7 +60,8 @@ std::vector<int> Day02Puzzle::getHighestValues(const std::map<std::string, std::
     return highest_values;
 }
 
-int Day02Puzzle::solvePartOne(std::vector<std::string> &puzzle_input) {
+template<>
+int DayPuzzle<2>::solvePartOne(PuzzleService &, const std::vector<std::string> &puzzle_input) {
     int sum = 0;
 
     for (const auto &line: puzzle_input) {
@@ -81,7 +82,8 @@ int Day02Puzzle::solvePartOne(std::vector<std::string> &puzzle_input) {
     return sum;
 }
 
-int Day02Puzzle::solvePartTwo(std::vector<std::string> &puzzle_input) {
+template<>
+int DayPuzzle<2>::solvePartTwo(PuzzleService &, const std::vector<std::string> &puzzle_input) {
     int sum = 0;
 
     for (const auto &line: puzzle_input) {
@@ -102,4 +104,7 @@ int Day02Puzzle::solvePartTwo(std::vector<std::string> &puzzle_input) {
     return sum;
 }
 
-[[maybe_unused]] PuzzleRegistrar<2, Day02Puzzle> Day02Puzzle::registrar_("Cube Conundrum");
+template<>
+const char *DayPuzzle<2>::getTitle() {
+    return "Cube Conundrum";
+}

@@ -1,4 +1,4 @@
-#include "puzzle/puzzle_registry.hpp"
+#include "puzzle/day_puzzle.hpp"
 #include "service/puzzle_service_mock.hpp"
 #include "session/session.hpp"
 #include <fstream>
@@ -7,28 +7,42 @@
 
 using testing::NiceMock;
 using json = nlohmann::json;
+using TestFunction = std::function<void(const std::vector<std::string> &, const std::vector<std::string> &, int, int, PuzzleService &)>;
 
-std::vector<std::tuple<int, std::vector<std::string>, std::vector<std::string>, int, int>> loadPuzzleData() {
-    std::ifstream file("tests/data/sample_puzzle_data.json");
-    json j;
-    file >> j;
+template<int Day>
+void testDayPuzzle(const std::vector<std::string> &input,
+                   const std::vector<std::string> &alt_input,
+                   const int expected_part_one,
+                   const int expected_part_two,
+                   PuzzleService &puzzle_service) {
+    const int partOne = DayPuzzle<Day>::solvePartOne(puzzle_service, input);
+    ASSERT_EQ(partOne, expected_part_one);
 
-    std::vector<std::tuple<int, std::vector<std::string>, std::vector<std::string>, int, int>> test_cases;
-    for (auto &item: j) {
-        int day = item["day"];
-        std::vector<std::string> input = item["input"];
-        std::vector<std::string> _input = item.value("_input", input);
-        int expected_part_one = item["expected_part_one"];
-        int expected_part_two = item["expected_part_two"];
+    const int partTwo = DayPuzzle<Day>::solvePartTwo(puzzle_service, alt_input);
+    ASSERT_EQ(partTwo, expected_part_two);
+}
 
-        test_cases.emplace_back(day, input, _input, expected_part_one, expected_part_two);
+void populateTestFunctionMap(std::map<int, TestFunction> &) {}
+
+template<int Day, int... Days>
+void populateTestFunctionMap(std::map<int, TestFunction> &test_map) {
+    test_map[Day + 1] = &testDayPuzzle<Day + 1>;
+    if constexpr (sizeof...(Days) > 0) {
+        populateTestFunctionMap<Days...>(test_map);
     }
+}
 
-    return test_cases;
+template<int... Days>
+std::map<int, TestFunction> mapTestFunctions(std::integer_sequence<int, Days...>) {
+    std::map<int, TestFunction> test_map;
+    populateTestFunctionMap<Days...>(test_map);
+    return test_map;
 }
 
 class DayPuzzleTest : public testing::TestWithParam<std::tuple<int, std::vector<std::string>, std::vector<std::string>, int, int>> {
 protected:
+    static inline std::map<int, TestFunction> test_function_map = mapTestFunctions(std::make_integer_sequence<int, 7>{});
+
     Session session_mock_;
     NiceMock<PuzzleServiceMock> puzzle_service_mock_;
 
@@ -37,17 +51,37 @@ protected:
 };
 
 TEST_P(DayPuzzleTest, SolvePuzzle) {
-    auto [day, puzzle_input, _puzzle_input, expected_part_one, expected_part_two] = GetParam();
-    const auto puzzle = PuzzleRegistry::getInstance().createPuzzle(day, puzzle_service_mock_);
+    auto [day, input, alt_input, expected_part_one, expected_part_two] = GetParam();
+    if (const auto it = test_function_map.find(day); it != test_function_map.end()) {
+        it->second(input, alt_input, expected_part_one, expected_part_two, puzzle_service_mock_);
+    } else {
+        FAIL() << "Test case for day " << day << " not implemented.";
+    }
+}
 
-    EXPECT_EQ(expected_part_one, puzzle->solvePartOne(puzzle_input));
-    EXPECT_EQ(expected_part_two, puzzle->solvePartTwo(_puzzle_input));
+std::vector<std::tuple<int, std::vector<std::string>, std::vector<std::string>, int, int>> parseJson() {
+    std::ifstream file("tests/data/sample_puzzle_data.json");
+    json j;
+    file >> j;
+
+    std::vector<std::tuple<int, std::vector<std::string>, std::vector<std::string>, int, int>> test_cases;
+    for (auto &item: j) {
+        int day = item["day"];
+        std::vector<std::string> input = item["input"];
+        std::vector<std::string> alt_input = item.value("alt_input", input);
+        int expected_part_one = item["expected_part_one"];
+        int expected_part_two = item["expected_part_two"];
+
+        test_cases.emplace_back(day, input, alt_input, expected_part_one, expected_part_two);
+    }
+
+    return test_cases;
 }
 
 INSTANTIATE_TEST_SUITE_P(
         DayPuzzles,
         DayPuzzleTest,
-        testing::ValuesIn(loadPuzzleData()));
+        testing::ValuesIn(parseJson()));
 
 int main(int argc, char **argv) {
     testing::InitGoogleTest(&argc, argv);

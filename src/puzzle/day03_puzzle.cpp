@@ -1,12 +1,11 @@
-#include "puzzle/day03_puzzle.hpp"
-#include <iostream>
+#include "puzzle/day_puzzle.hpp"
 #include <set>
 
-bool Day03Puzzle::isSymbol(const char c) {
+bool isSymbol(const char c) {
     return !isdigit(c) && c != '.';
 }
 
-bool Day03Puzzle::isAdjacent(const std::vector<std::string> &schematic, const int x, const int y) {
+bool isAdjacent(const std::vector<std::string> &schematic, const int x, const int y) {
     for (int dx = -1; dx <= 1; dx++) {
         for (int dy = -1; dy <= 1; dy++) {
             const int new_x = x + dx;
@@ -18,7 +17,7 @@ bool Day03Puzzle::isAdjacent(const std::vector<std::string> &schematic, const in
     return false;
 }
 
-int Day03Puzzle::findPartNumber(const std::vector<std::string> &schematic, const int x, int y) {
+int findPartNumber(const std::vector<std::string> &schematic, const int x, int y) {
     if (x >= 0 && x < schematic.size() && y >= 0 && y < schematic[0].size() && isdigit(schematic[x][y])) {
         while (y > 0 && isdigit(schematic[x][y - 1])) {
             y--;
@@ -36,7 +35,8 @@ int Day03Puzzle::findPartNumber(const std::vector<std::string> &schematic, const
     return -1;
 }
 
-int Day03Puzzle::solvePartOne(std::vector<std::string> &puzzle_input) {
+template<>
+int DayPuzzle<3>::solvePartOne(PuzzleService &, const std::vector<std::string> &puzzle_input) {
     int total_sum = 0;
 
     for (int i = 0; i < puzzle_input.size(); i++) {
@@ -61,7 +61,8 @@ int Day03Puzzle::solvePartOne(std::vector<std::string> &puzzle_input) {
     return total_sum;
 }
 
-int Day03Puzzle::solvePartTwo(std::vector<std::string> &puzzle_input) {
+template<>
+int DayPuzzle<3>::solvePartTwo(PuzzleService &, const std::vector<std::string> &puzzle_input) {
     int total_sum = 0;
 
     for (int i = 0; i < puzzle_input.size(); i++) {
@@ -89,4 +90,7 @@ int Day03Puzzle::solvePartTwo(std::vector<std::string> &puzzle_input) {
     return total_sum;
 }
 
-[[maybe_unused]] PuzzleRegistrar<3, Day03Puzzle> Day03Puzzle::registrar_("Gear Ratios");
+template<>
+const char *DayPuzzle<3>::getTitle() {
+    return "Gear Ratios";
+}

@@ -1,17 +1,16 @@
 #pragma once
 
 #include "service/puzzle_service.hpp"
+#include <vector>
 
+template<int Day>
 class DayPuzzle {
-protected:
-    PuzzleService puzzle_service_;
-
 public:
-    explicit DayPuzzle(const PuzzleService &puzzle_service) : puzzle_service_(puzzle_service) {}
+    static constexpr int day = Day;
 
-    virtual ~DayPuzzle() = default;
+    static int solvePartOne(PuzzleService &, const std::vector<std::string> &);
 
-    virtual int solvePartOne(std::vector<std::string> &puzzle_input) = 0;
+    static int solvePartTwo(PuzzleService &, const std::vector<std::string> &);
 
-    virtual int solvePartTwo(std::vector<std::string> &puzzle_input) = 0;
+    static const char *getTitle();
 };
