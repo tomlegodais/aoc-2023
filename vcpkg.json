@@ -5,7 +5,6 @@
     "cpr",
     "gtest",
     "nlohmann-json",
-    "boost-preprocessor",
-    "boost"
+    "boost-preprocessor"
   ]
 }

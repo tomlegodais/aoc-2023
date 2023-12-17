@@ -2,9 +2,13 @@
 #include <iostream>
 
 template<>
-int DayPuzzle<1>::solvePartOne(PuzzleService &puzzle_service, const std::vector<std::string> &puzzle_input) {
-    std::cout << "Hello from day 1 part 1." << std::endl;
+int DayPuzzle<1>::solvePartOne(PuzzleService &, const std::vector<std::string> &puzzle_input) {
     return 1;
+}
+
+template<>
+int DayPuzzle<1>::solvePartTwo(PuzzleService &, const std::vector<std::string> &puzzle_input) {
+    return 2;
 }
 
 template<>

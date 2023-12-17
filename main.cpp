@@ -7,7 +7,8 @@
 #include <set>
 
 using Puzzles = std::tuple<
-        DayPuzzle<1>>;
+        DayPuzzle<1>,
+        DayPuzzle<2>>;
 
 template<typename Puzzle>
 void printPuzzle() {
@@ -40,6 +41,42 @@ template<std::size_t I = 0, typename... Tp>
     return days;
 }
 
+template<int Day>
+void solvePuzzle(PuzzleService &puzzleService) {
+    std::cout << std::endl
+              << "Solving puzzle for day " << Day << ", please wait..." << std::endl;
+
+    const auto puzzle_input = puzzleService.readPuzzleInput(Day);
+    const auto [partOneResult, partOneTime] = utils::measureExecutionTime([&] {
+        return DayPuzzle<Day>::solvePartOne(puzzleService, puzzle_input);
+    });
+
+    const auto [partTwoResult, partTwoTime] = utils::measureExecutionTime([&] {
+        return DayPuzzle<Day>::solvePartTwo(puzzleService, puzzle_input);
+    });
+
+    std::cout << "Part One: " << partOneResult << ", took " << partOneTime << " milliseconds" << std::endl;
+    std::cout << "Part Two: " << partTwoResult << ", took " << partTwoTime << " milliseconds" << std::endl;
+}
+
+template<std::size_t I = 0, typename... Tp>
+std::enable_if_t<I == sizeof...(Tp), void>
+solvePuzzleForDay(std::tuple<Tp...> &, int, PuzzleService &) {
+    /* no-op */
+}
+
+template<std::size_t I = 0, typename... Tp>
+        std::enable_if_t < I<sizeof...(Tp), void>
+                           solvePuzzleForDay(std::tuple<Tp...> &puzzles, int day, PuzzleService &puzzleService) {
+    if constexpr (I < sizeof...(Tp)) {
+        if (std::tuple_element_t<I, std::tuple<Tp...>>::day == day) {
+            solvePuzzle<std::tuple_element_t<I, std::tuple<Tp...>>::day>(puzzleService);
+            return;
+        }
+        solvePuzzleForDay<I + 1, Tp...>(puzzles, day, puzzleService);
+    }
+}
+
 int promptForDay(const std::set<int> &days) {
     int day;
 
@@ -47,33 +84,16 @@ int promptForDay(const std::set<int> &days) {
         std::cout << "Enter the day you would like to solve (-1 to exit): ";
         std::cin >> day;
 
-        if (day == -1) {
-            return -1;
-        }
+        if (day == -1) return 0;
+        if (!std::cin.fail() && days.contains(day)) return day;
 
-        if (std::cin.fail() || !days.contains(day)) {
-            std::cout << "The day you entered is invalid, please try again." << std::endl
-                      << std::endl;
-
-            std::cin.clear();
-            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-            continue;
-        }
-
-        return day;
+        std::cin.clear();
+        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+        std::cout << "Invalid option. Please try again." << std::endl
+                  << std::endl;
     }
 }
 
-template<int Day>
-void solvePuzzle(PuzzleService &puzzle_service) {
-    auto puzzleInput = puzzle_service.readPuzzleInput(Day);
-
-    DayPuzzle<Day> day;
-
-    const int partOne = day.solvePartOne(puzzle_service, puzzleInput);
-
-    std::cout << "Part One: " << partOne << std::endl;
-}
 
 int main() {
     try {
@@ -83,16 +103,16 @@ int main() {
         Puzzles puzzles;
         listPuzzle(puzzles);
 
-        const auto puzzleDays = getPuzzleDays(puzzles);
-        const int day = promptForDay(puzzleDays);
+        const auto puzzle_days = getPuzzleDays(puzzles);
+        const int day = promptForDay(puzzle_days);
         if (day == -1) {
             return 0;
         }
 
         auto session = Session::init(".session");
-        auto puzzleService = PuzzleService(session);
+        auto puzzle_service = PuzzleService(session);
 
-        // solvePuzzle<1>(puzzleService);
+        solvePuzzleForDay(puzzles, day, puzzle_service);
     } catch (const std::exception &e) {
         std::cerr << "Error: " << e.what() << std::endl;
         return -1;
