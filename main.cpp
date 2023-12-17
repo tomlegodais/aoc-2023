@@ -6,16 +6,25 @@
 #include <limits>
 #include <set>
 
-template<typename Seq>
-struct PuzzleTuple;
+// template<typename Seq>
+// struct PuzzleTuple;
+//
+// template<int... Days>
+// struct PuzzleTuple<std::integer_sequence<int, Days...>> {
+//     using type = std::tuple<DayPuzzle<Days + 1>...>;
+// };
+//
+// using PuzzleDays = std::make_integer_sequence<int, 7>;
+// using Puzzles = PuzzleTuple<PuzzleDays>::type;
 
-template<int... Days>
-struct PuzzleTuple<std::integer_sequence<int, Days...>> {
-    using type = std::tuple<DayPuzzle<Days + 1>...>;
-};
-
-using PuzzleDays = std::make_integer_sequence<int, 7>;
-using Puzzles = PuzzleTuple<PuzzleDays>::type;
+using Puzzles = std::tuple<
+        DayPuzzle<1>,
+        DayPuzzle<2>,
+        DayPuzzle<3>,
+        DayPuzzle<4>,
+        DayPuzzle<5>,
+        DayPuzzle<6>,
+        DayPuzzle<7>>;
 
 template<typename Puzzle>
 void printPuzzle() {
@@ -74,8 +83,8 @@ solvePuzzleForDay(std::tuple<Tp...> &, int, PuzzleService &) {
 }
 
 template<std::size_t I = 0, typename... Tp>
-std::enable_if_t < I<sizeof...(Tp), void>
-solvePuzzleForDay(std::tuple<Tp...> &puzzles, int day, PuzzleService &puzzle_service) {
+        std::enable_if_t < I<sizeof...(Tp), void>
+                           solvePuzzleForDay(std::tuple<Tp...> &puzzles, int day, PuzzleService &puzzle_service) {
     if constexpr (I < sizeof...(Tp)) {
         if (std::tuple_element_t<I, std::tuple<Tp...>>::day == day) {
             solvePuzzle<std::tuple_element_t<I, std::tuple<Tp...>>::day>(puzzle_service);
