@@ -30,8 +30,8 @@ listPuzzle(std::tuple<Tp...> &) {
 }
 
 template<std::size_t I = 0, typename... Tp>
-        std::enable_if_t < I<sizeof...(Tp)>
-                           listPuzzle(std::tuple<Tp...> &t) {
+std::enable_if_t < I<sizeof...(Tp)>
+listPuzzle(std::tuple<Tp...> &t) {
     printPuzzle<std::tuple_element_t<I, std::tuple<Tp...>>>();
     listPuzzle<I + 1, Tp...>(t);
 }
@@ -43,8 +43,8 @@ getPuzzleDays(std::tuple<Tp...> &) {
 }
 
 template<std::size_t I = 0, typename... Tp>
-        constexpr std::enable_if_t < I<sizeof...(Tp), std::set<int>>
-                                     getPuzzleDays(std::tuple<Tp...> &t) {
+constexpr std::enable_if_t < I<sizeof...(Tp), std::set<int>>
+getPuzzleDays(std::tuple<Tp...> &t) {
     std::set<int> days = getPuzzleDays<I + 1>(t);
     days.insert(std::tuple_element_t<I, std::tuple<Tp...>>::day);
     return days;
@@ -75,8 +75,8 @@ solvePuzzleForDay(std::tuple<Tp...> &, int, PuzzleService &) {
 }
 
 template<std::size_t I = 0, typename... Tp>
-        std::enable_if_t < I<sizeof...(Tp), void>
-                           solvePuzzleForDay(std::tuple<Tp...> &puzzles, int day, PuzzleService &puzzle_service) {
+std::enable_if_t < I<sizeof...(Tp), void>
+solvePuzzleForDay(std::tuple<Tp...> &puzzles, int day, PuzzleService &puzzle_service) {
     if constexpr (I < sizeof...(Tp)) {
         if (std::tuple_element_t<I, std::tuple<Tp...>>::day == day) {
             solvePuzzle<std::tuple_element_t<I, std::tuple<Tp...>>::day>(puzzle_service);
