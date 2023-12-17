@@ -5,6 +5,7 @@
 #include <iostream>
 #include <limits>
 #include <set>
+#include <tuple>
 
 // template<typename Seq>
 // struct PuzzleTuple;
