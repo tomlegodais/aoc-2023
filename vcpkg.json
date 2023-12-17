@@ -4,7 +4,6 @@
   "dependencies": [
     "cpr",
     "gtest",
-    "nlohmann-json",
-    "boost-preprocessor"
+    "nlohmann-json"
   ]
 }

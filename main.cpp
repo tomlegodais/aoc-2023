@@ -6,9 +6,16 @@
 #include <limits>
 #include <set>
 
-using Puzzles = std::tuple<
-        DayPuzzle<1>,
-        DayPuzzle<2>>;
+template<typename Seq>
+struct PuzzleTuple;
+
+template<int... Days>
+struct PuzzleTuple<std::integer_sequence<int, Days...>> {
+    using type = std::tuple<DayPuzzle<Days + 1>...>;
+};
+
+using PuzzleDays = std::make_integer_sequence<int, 7>;
+using Puzzles = PuzzleTuple<PuzzleDays>::type;
 
 template<typename Puzzle>
 void printPuzzle() {
@@ -22,7 +29,8 @@ listPuzzle(std::tuple<Tp...> &) {
 }
 
 template<std::size_t I = 0, typename... Tp>
-        std::enable_if_t < I<sizeof...(Tp)> listPuzzle(std::tuple<Tp...> &t) {
+std::enable_if_t < I<sizeof...(Tp)>
+listPuzzle(std::tuple<Tp...> &t) {
     printPuzzle<std::tuple_element_t<I, std::tuple<Tp...>>>();
     listPuzzle<I + 1, Tp...>(t);
 }
@@ -34,25 +42,25 @@ getPuzzleDays(std::tuple<Tp...> &) {
 }
 
 template<std::size_t I = 0, typename... Tp>
-        constexpr std::enable_if_t < I<sizeof...(Tp), std::set<int>>
-                                     getPuzzleDays(std::tuple<Tp...> &t) {
+constexpr std::enable_if_t < I<sizeof...(Tp), std::set<int>>
+getPuzzleDays(std::tuple<Tp...> &t) {
     std::set<int> days = getPuzzleDays<I + 1>(t);
     days.insert(std::tuple_element_t<I, std::tuple<Tp...>>::day);
     return days;
 }
 
 template<int Day>
-void solvePuzzle(PuzzleService &puzzleService) {
+void solvePuzzle(PuzzleService &puzzle_service) {
     std::cout << std::endl
               << "Solving puzzle for day " << Day << ", please wait..." << std::endl;
 
-    const auto puzzle_input = puzzleService.readPuzzleInput(Day);
+    const auto puzzle_input = puzzle_service.readPuzzleInput(Day);
     const auto [partOneResult, partOneTime] = utils::measureExecutionTime([&] {
-        return DayPuzzle<Day>::solvePartOne(puzzleService, puzzle_input);
+        return DayPuzzle<Day>::solvePartOne(puzzle_service, puzzle_input);
     });
 
     const auto [partTwoResult, partTwoTime] = utils::measureExecutionTime([&] {
-        return DayPuzzle<Day>::solvePartTwo(puzzleService, puzzle_input);
+        return DayPuzzle<Day>::solvePartTwo(puzzle_service, puzzle_input);
     });
 
     std::cout << "Part One: " << partOneResult << ", took " << partOneTime << " milliseconds" << std::endl;
@@ -66,14 +74,14 @@ solvePuzzleForDay(std::tuple<Tp...> &, int, PuzzleService &) {
 }
 
 template<std::size_t I = 0, typename... Tp>
-        std::enable_if_t < I<sizeof...(Tp), void>
-                           solvePuzzleForDay(std::tuple<Tp...> &puzzles, int day, PuzzleService &puzzleService) {
+std::enable_if_t < I<sizeof...(Tp), void>
+solvePuzzleForDay(std::tuple<Tp...> &puzzles, int day, PuzzleService &puzzle_service) {
     if constexpr (I < sizeof...(Tp)) {
         if (std::tuple_element_t<I, std::tuple<Tp...>>::day == day) {
-            solvePuzzle<std::tuple_element_t<I, std::tuple<Tp...>>::day>(puzzleService);
+            solvePuzzle<std::tuple_element_t<I, std::tuple<Tp...>>::day>(puzzle_service);
             return;
         }
-        solvePuzzleForDay<I + 1, Tp...>(puzzles, day, puzzleService);
+        solvePuzzleForDay<I + 1, Tp...>(puzzles, day, puzzle_service);
     }
 }
 
