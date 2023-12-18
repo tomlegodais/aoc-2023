@@ -1,36 +1,48 @@
 #include "puzzle/day_puzzle.hpp"
 #include "util/utils.hpp"
 #include <iostream>
-#include <map>
 #include <sstream>
 #include <unordered_map>
 
-using SectionMap = std::map<std::pair<long, long>, std::pair<long long, long long>>;
+using i64 = long long;
+using MapNames = std::string[7];
+
+struct MapSection {
+    i64 source_start;
+    i64 destination_start;
+    i64 length;
+
+    MapSection(const i64 source_start, const i64 destination_start, const i64 length)
+        : source_start(source_start), destination_start(destination_start), length(length) {}
+};
+
+using SectionMap = std::vector<MapSection>;
 using SectionsMapping = std::unordered_map<std::string, SectionMap>;
+
+std::vector<i64> parseSeeds(const std::string &line) {
+    std::vector<i64> seeds;
+    const auto str = line.substr(line.find("seeds: ") + 7);
+    std::stringstream ss(str);
+    i64 seed;
+    while (ss >> seed) {
+        seeds.push_back(seed);
+    }
+    return seeds;
+}
 
 SectionsMapping parseAllSections(const std::vector<std::string> &input) {
     SectionsMapping sections_mapping;
-    std::string current_section;
-    const SectionMap *current_map = nullptr;
+    SectionMap *current_map = nullptr;
 
     for (const auto &line: input) {
-        if (line.empty()) {
-            current_section.clear();
-            current_map = nullptr;
-            continue;
-        }
-
         if (line.back() == ':') {
-            current_section = line;
+            const std::string &current_section = line;
             current_map = &sections_mapping[current_section];
-            continue;
-        }
-
-        if (current_map) {
+        } else if (current_map) {
             std::istringstream iss(line);
-            int destination_start, source_start;
-            if (int length; iss >> destination_start >> source_start >> length) {
-                // TODO: Finish implementation
+            i64 destination_start, source_start;
+            if (i64 length; iss >> destination_start >> source_start >> length) {
+                current_map->emplace_back(source_start, destination_start, length - 1);
             }
         }
     }
@@ -38,58 +50,41 @@ SectionsMapping parseAllSections(const std::vector<std::string> &input) {
     return sections_mapping;
 }
 
-template<>
-int DayPuzzle<5>::solvePartOne(PuzzleService &, const std::vector<std::string> &puzzle_input) {
-    std::vector<std::string> lines = {
-            "seeds: 79 14 55 13",
-            "",
-            "seed-to-soil map:",
-            "50 98 2",
-            "52 50 48",
-            "",
-            "soil-to-fertilizer map:",
-            "0 15 37",
-            "37 52 2",
-            "39 0 15",
-            "",
-            "fertilizer-to-water map:",
-            "49 53 8",
-            "0 11 42",
-            "42 0 7",
-            "57 7 4",
-            "",
-            "water-to-light map:",
-            "88 18 7",
-            "18 25 70",
-            "",
-            "light-to-temperature map:",
-            "45 77 23",
-            "81 45 19",
-            "68 64 13",
-            "",
-            "temperature-to-humidity map:",
-            "0 69 1",
-            "1 0 69",
-            "",
-            "humidity-to-location map:",
-            "60 56 37",
-            "56 93 4"};
-
-    std::vector<int> seeds_vector;
-    for (auto &line: puzzle_input) {
-        if (line.find("seeds: ") != std::string::npos) {
-            std::string seeds = line.substr(line.find("seeds: ") + 7);
-            std::stringstream ss(seeds);
-            int seed;
-            while (ss >> seed) {
-                seeds_vector.push_back(seed);
-            }
+i64 findValue(const SectionMap &map, const i64 id) {
+    for (const auto &section: map) {
+        if (id >= section.source_start && id <= section.source_start + section.length) {
+            return section.destination_start + id - section.source_start;
         }
     }
 
-    const auto sections_mapping = parseAllSections(puzzle_input);
+    return id;
+}
 
-    return 0;
+i64 processSeed(const SectionsMapping &sections_mapping, const MapNames &map_names, i64 seed) {
+    for (const auto &map_name: map_names) {
+        if (const auto it = sections_mapping.find(map_name); it != sections_mapping.end()) {
+            seed = findValue(it->second, seed);
+        }
+    }
+    return seed;
+}
+
+template<>
+int DayPuzzle<5>::solvePartOne(PuzzleService &, const std::vector<std::string> &puzzle_input) {
+    const auto seeds = parseSeeds(puzzle_input.front());
+    const auto sections_mapping = parseAllSections(puzzle_input);
+    const MapNames map_names = {"seed-to-soil map:", "soil-to-fertilizer map:", "fertilizer-to-water map:",
+                                "water-to-light map:", "light-to-temperature map:", "temperature-to-humidity map:",
+                                "humidity-to-location map:"};
+
+    i64 min_location = -1;
+    for (const auto &seed: seeds) {
+        if (const i64 location = processSeed(sections_mapping, map_names, seed); min_location == -1 || location < min_location) {
+            min_location = location;
+        }
+    }
+
+    return static_cast<int>(min_location);
 }
 
 template<>
