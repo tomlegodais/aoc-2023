@@ -1,6 +1,7 @@
 #include "puzzle/day_puzzle.hpp"
 #include "util/utils.hpp"
-#include <iostream>
+#include <future>
+#include <queue>
 #include <sstream>
 #include <unordered_map>
 
@@ -18,6 +19,7 @@ struct MapSection {
 
 using SectionMap = std::vector<MapSection>;
 using SectionsMapping = std::unordered_map<std::string, SectionMap>;
+using SeedRange = std::vector<std::pair<i64, i64>>;
 
 std::vector<i64> parseSeeds(const std::string &line) {
     std::vector<i64> seeds;
@@ -28,6 +30,17 @@ std::vector<i64> parseSeeds(const std::string &line) {
         seeds.push_back(seed);
     }
     return seeds;
+}
+
+SeedRange parseSeedRange(const std::string &line) {
+    SeedRange seed_range;
+    const auto str = line.substr(line.find("seeds: ") + 7);
+    std::stringstream ss(str);
+    i64 seed_start, length;
+    while (ss >> seed_start >> length) {
+        seed_range.emplace_back(seed_start, length);
+    }
+    return seed_range;
 }
 
 SectionsMapping parseAllSections(const std::vector<std::string> &input) {
@@ -60,13 +73,39 @@ i64 findValue(const SectionMap &map, const i64 id) {
     return id;
 }
 
+std::unordered_map<i64, i64> cache;
+std::mutex cache_mutex;
+
 i64 processSeed(const SectionsMapping &sections_mapping, const MapNames &map_names, i64 seed) {
+    {
+        std::lock_guard lock(cache_mutex);
+        if (const auto it = cache.find(seed); it != cache.end()) {
+            return it->second;
+        }
+    }
+
     for (const auto &map_name: map_names) {
         if (const auto it = sections_mapping.find(map_name); it != sections_mapping.end()) {
             seed = findValue(it->second, seed);
         }
     }
+
+    {
+        std::lock_guard lock(cache_mutex);
+        cache[seed] = seed;
+    }
     return seed;
+}
+
+i64 processSeedRange(const SectionsMapping &sections_mapping, const MapNames &map_names, const i64 seed_start, const i64 length) {
+    i64 min_location = -1;
+    for (i64 i = 0; i < length; ++i) {
+        const i64 seed = seed_start + i;
+        if (const i64 location = processSeed(sections_mapping, map_names, seed); min_location == -1 || location < min_location) {
+            min_location = location;
+        }
+    }
+    return min_location;
 }
 
 template<>
@@ -89,7 +128,27 @@ int DayPuzzle<5>::solvePartOne(PuzzleService &, const std::vector<std::string> &
 
 template<>
 int DayPuzzle<5>::solvePartTwo(PuzzleService &, const std::vector<std::string> &puzzle_input) {
-    return 0;
+    const auto seed_range = parseSeedRange(puzzle_input.front());
+    const auto sections_mapping = parseAllSections(puzzle_input);
+    const MapNames map_names = {"seed-to-soil map:", "soil-to-fertilizer map:", "fertilizer-to-water map:",
+                                "water-to-light map:", "light-to-temperature map:", "temperature-to-humidity map:",
+                                "humidity-to-location map:"};
+
+    std::vector<std::future<i64>> futures;
+    for (const auto &[seed_start, length]: seed_range) {
+        futures.emplace_back(std::async(std::launch::async, [&sections_mapping, &map_names, seed_start, length] {
+            return processSeedRange(sections_mapping, map_names, seed_start, length);
+        }));
+    }
+
+    i64 min_location = -1;
+    for (auto &f: futures) {
+        if (const i64 location = f.get(); min_location == -1 || location < min_location) {
+            min_location = location;
+        }
+    }
+
+    return static_cast<int>(min_location);
 }
 
 template<>
