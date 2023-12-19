@@ -1,62 +1,15 @@
 #include "puzzle/day_puzzle.hpp"
 #include "util/utils.hpp"
-
-#include <atomic>
 #include <functional>
 #include <future>
-#include <iomanip>
 #include <iostream>
-#include <numeric>
+#include <ranges>
 #include <sstream>
 #include <unordered_map>
 
 using i64 = long long;
-using MapNames = std::string[7];
-
-struct MapSection {
-    i64 source_start;
-    i64 destination_start;
-    i64 length;
-
-    MapSection(const i64 source_start, const i64 destination_start, const i64 length)
-        : source_start(source_start), destination_start(destination_start), length(length) {}
-};
-
-using SectionMap = std::vector<MapSection>;
-using SectionsMapping = std::unordered_map<std::string, SectionMap>;
+using MapNames = std::vector<std::string>;
 using SeedRange = std::vector<std::pair<i64, i64>>;
-
-void displayProgressBar(const size_t current, const size_t total) {
-    constexpr int bar_width = 70;
-    const float progress = static_cast<float>(current) / total;
-
-    std::cout << "[";
-    const int pos = bar_width * progress;
-    for (int i = 0; i < bar_width; ++i) {
-        if (i < pos) std::cout << "=";
-        else if (i == pos)
-            std::cout << ">";
-        else
-            std::cout << " ";
-    }
-    std::cout << std::fixed << std::setprecision(2);
-    std::cout << "] " << progress * 100.0 << "% (" << current << "/" << total <<  ")\r";
-    std::cout.flush();
-}
-
-struct ProgressTracker {
-    std::atomic<size_t> total_processed;
-    size_t total_seeds;
-    std::mutex display_mutex;
-
-    explicit ProgressTracker(size_t total_seeds) : total_seeds(total_seeds) {}
-
-    void updateProgress(const int processed) {
-        total_processed += processed;
-        std::lock_guard lock(display_mutex);
-        displayProgressBar(total_processed, total_seeds);
-    }
-};
 
 std::vector<i64> parseSeeds(const std::string &line) {
     std::vector<i64> seeds;
@@ -80,119 +33,262 @@ SeedRange parseSeedRange(const std::string &line) {
     return seed_range;
 }
 
-SectionsMapping parseAllSections(const std::vector<std::string> &input) {
-    SectionsMapping sections_mapping;
-    SectionMap *current_map = nullptr;
+size_t calculateTotalSeeds(const SeedRange &seed_range) {
+    size_t total = 0;
+    for (const auto &length: seed_range | std::views::values) {
+        total += static_cast<size_t>(length);
+    }
+    return total;
+}
 
+std::vector<SeedRange> splitSeedRange(const SeedRange &seed_range, const size_t split_size) {
+    const size_t total_seeds = calculateTotalSeeds(seed_range);
+    std::cout << "Total seed count: " << total_seeds << std::endl;
+
+    const size_t seeds_per_split = total_seeds / split_size;
+    const size_t remainder = total_seeds % split_size;
+    std::vector<SeedRange> split_ranges(split_size);
+
+    auto it = seed_range.begin();
+    size_t current_remmaining = it->second;
+
+    for (size_t split = 0; split < split_size; ++split) {
+        size_t seeds_in_split = split < remainder ? seeds_per_split + 1 : seeds_per_split;
+        split_ranges[split] = SeedRange();
+
+        while (seeds_in_split > 0 && it != seed_range.end()) {
+            if (current_remmaining <= seeds_in_split) {
+                split_ranges[split].emplace_back(it->first, current_remmaining);
+                seeds_in_split -= current_remmaining;
+                ++it;
+                if (it != seed_range.end()) {
+                    current_remmaining = it->second;
+                }
+            } else {
+                split_ranges[split].emplace_back(it->first, seeds_in_split);
+                current_remmaining -= seeds_in_split;
+                if (current_remmaining == 0) {
+                    ++it;
+                    if (it != seed_range.end()) {
+                        current_remmaining = it->second;
+                    }
+                }
+                break;
+            }
+        }
+    }
+    return split_ranges;
+}
+
+class SeedGenerator {
+    std::vector<std::pair<i64, i64>>::const_iterator current;
+    std::vector<std::pair<i64, i64>>::const_iterator end;
+    i64 current_seed;
+    i64 range_end;
+    size_t batch_size;
+    std::unique_ptr<i64[]> batch_array;
+
+public:
+    explicit SeedGenerator(const SeedRange &seed_range, const size_t batch_size)
+        : current(seed_range.begin()), end(seed_range.end()),
+          current_seed(current->first), range_end(current->first + current->second),
+          batch_size(batch_size), batch_array(std::make_unique<i64[]>(batch_size)) {}
+
+    SeedGenerator(const SeedGenerator &) = delete;
+    SeedGenerator &operator=(const SeedGenerator &) = delete;
+
+    i64 *nextBatch(size_t &actual_batch_size) {
+        actual_batch_size = 0;
+
+        while (actual_batch_size < batch_size) {
+            if (current == end) break;
+
+            i64 remaining_in_range = range_end - current_seed;
+            i64 space_in_batch = batch_size - actual_batch_size;
+            const i64 seeds_to_add = std::min(remaining_in_range, space_in_batch);
+
+            for (i64 i = 0; i < seeds_to_add; ++i) {
+                batch_array[actual_batch_size++] = current_seed + i;
+            }
+
+            current_seed += seeds_to_add;
+            if (current_seed >= range_end) {
+                ++current;
+                if (current != end) {
+                    current_seed = current->first;
+                    range_end = current_seed + current->second;
+                }
+            }
+        }
+
+        return actual_batch_size > 0 ? batch_array.get() : nullptr;
+    }
+};
+
+struct Interval {
+    i64 start;
+    i64 end;
+    i64 offset;
+
+    Interval(const i64 start, const i64 end, const i64 offset)
+        : start(start), end(end), offset(offset) {}
+};
+
+class IntervalTree {
+    std::vector<Interval> intervals_;
+
+public:
+    void addInterval(i64 start, const i64 length, const i64 destination_start) {
+        intervals_.emplace_back(start, start + length, destination_start - start);
+    }
+
+    void buildTree() {
+        std::ranges::sort(intervals_, [](const Interval &a, const Interval &b) {
+            return a.start < b.start;
+        });
+    }
+
+    [[nodiscard]] i64 mapValue(const i64 value) const {
+        int low = 0, high = intervals_.size() - 1;
+        while (low <= high) {
+            const int mid = low + (high - low) / 2;
+            if (const auto &interval = intervals_[mid]; value >= interval.start && value < interval.end) {
+                return value + interval.offset;
+            } else if (value < interval.start) {
+                high = mid - 1;
+            } else {
+                low = mid + 1;
+            }
+        }
+        return value;
+    }
+};
+
+std::unordered_map<std::string, IntervalTree> parseIntervalTrees(const std::vector<std::string> &input) {
+    std::string current_map;
+    std::unordered_map<std::string, IntervalTree> interval_trees;
     for (const auto &line: input) {
         if (line.back() == ':') {
-            const std::string &current_section = line;
-            current_map = &sections_mapping[current_section];
-        } else if (current_map) {
+            current_map = line.substr(0, line.size() - 1);
+            interval_trees[current_map] = IntervalTree();
+        } else {
             std::istringstream iss(line);
-            i64 destination_start, source_start;
-            if (i64 length; iss >> destination_start >> source_start >> length) {
-                current_map->emplace_back(source_start, destination_start, length - 1);
+            i64 desination_start, source_start;
+            if (i64 length; iss >> desination_start >> source_start >> length) {
+                interval_trees[current_map].addInterval(source_start, length, desination_start);
             }
         }
     }
 
-    return sections_mapping;
-}
-
-i64 findValue(const SectionMap &map, const i64 id) {
-    for (const auto &section: map) {
-        if (id >= section.source_start && id <= section.source_start + section.length) {
-            return section.destination_start + id - section.source_start;
-        }
+    for (auto &tree: interval_trees | std::views::values) {
+        tree.buildTree();
     }
 
-    return id;
+    return interval_trees;
 }
 
-std::unordered_map<i64, i64> cache;
-std::mutex cache_mutex;
-
-i64 processSeed(const SectionsMapping &sections_mapping, const MapNames &map_names, i64 seed) {
-    {
-        std::lock_guard lock(cache_mutex);
-        if (const auto it = cache.find(seed); it != cache.end()) {
-            return it->second;
-        }
-    }
-
+i64 processSeed(const std::unordered_map<std::string, IntervalTree> &interval_trees, const MapNames &map_names, i64 seed) {
     for (const auto &map_name: map_names) {
-        if (const auto it = sections_mapping.find(map_name); it != sections_mapping.end()) {
-            seed = findValue(it->second, seed);
-        }
-    }
-
-    {
-        std::lock_guard lock(cache_mutex);
-        cache[seed] = seed;
+        seed = interval_trees.at(map_name).mapValue(seed);
     }
     return seed;
 }
 
-i64 processSeedRange(const SectionsMapping &sections_mapping, const MapNames &map_names, const i64 seed_start, const i64 length, ProgressTracker &progress_tracker) {
-    i64 min_location = -1;
-    for (i64 i = 0; i < length; ++i) {
-        const i64 seed = seed_start + i;
-        if (const i64 location = processSeed(sections_mapping, map_names, seed); min_location == -1 || location < min_location) {
-            min_location = location;
+std::pair<i64, size_t> processBatch(const SeedRange &seed_range, const std::unordered_map<std::string, IntervalTree> &interval_trees, const MapNames &map_names) {
+    SeedGenerator seed_generator(seed_range, 5000);
+    size_t actual_batch_size;
+    i64 lowest_location = LLONG_MAX;
+    size_t seeds_processed = 0;
+
+    while (true) {
+        const i64 *seeds = seed_generator.nextBatch(actual_batch_size);
+        if (actual_batch_size == 0) break;
+
+        for (size_t i = 0; i < actual_batch_size; ++i) {
+            const i64 seed = seeds[i];
+            if (const i64 location = processSeed(interval_trees, map_names, seed); location < lowest_location) {
+                lowest_location = location;
+            }
+            ++seeds_processed;
         }
-        progress_tracker.updateProgress(1);
     }
-    return min_location;
+    return std::make_pair(lowest_location, seeds_processed);
 }
 
 template<>
 int DayPuzzle<5>::solvePartOne(PuzzleService &, const std::vector<std::string> &puzzle_input) {
     const auto seeds = parseSeeds(puzzle_input.front());
-    const auto sections_mapping = parseAllSections(puzzle_input);
-    const MapNames map_names = {"seed-to-soil map:", "soil-to-fertilizer map:", "fertilizer-to-water map:",
-                                "water-to-light map:", "light-to-temperature map:", "temperature-to-humidity map:",
-                                "humidity-to-location map:"};
+    const auto interval_trees = parseIntervalTrees(puzzle_input);
+    const MapNames map_names = {"seed-to-soil map", "soil-to-fertilizer map", "fertilizer-to-water map",
+                                "water-to-light map", "light-to-temperature map", "temperature-to-humidity map",
+                                "humidity-to-location map"};
 
-    i64 min_location = -1;
+
+    i64 lowest_location = LLONG_MAX;
     for (const auto &seed: seeds) {
-        if (const i64 location = processSeed(sections_mapping, map_names, seed); min_location == -1 || location < min_location) {
-            min_location = location;
+        if (const i64 location = processSeed(interval_trees, map_names, seed); location < lowest_location) {
+            lowest_location = location;
         }
     }
 
-    return static_cast<int>(min_location);
+    return lowest_location;
 }
 
 template<>
 int DayPuzzle<5>::solvePartTwo(PuzzleService &, const std::vector<std::string> &puzzle_input) {
-    const auto seed_range = parseSeedRange(puzzle_input.front());
-    const auto sections_mapping = parseAllSections(puzzle_input);
-    const MapNames map_names = {"seed-to-soil map:", "soil-to-fertilizer map:", "fertilizer-to-water map:",
-                                "water-to-light map:", "light-to-temperature map:", "temperature-to-humidity map:",
-                                "humidity-to-location map:"};
+    std::vector<std::string> test_input = {
+            "seeds: 50 20",
+            "seed-to-soil map:",
+            "50 98 2",
+            "52 50 48",
+            "soil-to-fertilizer map:",
+            "0 15 37",
+            "37 52 2",
+            "39 0 15",
+            "fertilizer-to-water map:",
+            "49 53 8",
+            "0 11 42",
+            "42 0 7",
+            "57 7 4",
+            "water-to-light map:",
+            "88 18 7",
+            "18 25 70",
+            "light-to-temperature map:",
+            "45 77 23",
+            "81 45 19",
+            "68 64 13",
+            "temperature-to-humidity map:",
+            "0 69 1",
+            "1 0 69",
+            "humidity-to-location map:",
+            "60 56 37",
+            "56 93 4"};
 
-    const size_t total_seeds = std::accumulate(seed_range.begin(), seed_range.end(), 0, [](i64 sum, const auto &range) {
-        return sum + range.second;
-    });
+    const auto seed_range = parseSeedRange(test_input.front());
+    const unsigned int thread_count = std::thread::hardware_concurrency();
+    const auto split_range = splitSeedRange(seed_range, thread_count);
+    const auto interval_trees = parseIntervalTrees(test_input);
+    const MapNames map_names = {"seed-to-soil map", "soil-to-fertilizer map", "fertilizer-to-water map",
+                                "water-to-light map", "light-to-temperature map", "temperature-to-humidity map",
+                                "humidity-to-location map"};
 
-    ProgressTracker tracker(total_seeds);
-    std::vector<std::future<i64>> futures;
-
-    for (const auto &[seed_start, length]: seed_range) {
-        futures.emplace_back(std::async(std::launch::async, [&sections_mapping, &map_names, seed_start, length, &tracker] {
-            return processSeedRange(sections_mapping, map_names, seed_start, length, tracker);
-        }));
+    std::vector<std::future<std::pair<i64, size_t>>> futures;
+    for (unsigned int i = 0; i < thread_count; ++i) {
+        futures.push_back(std::async(std::launch::async, processBatch, split_range[i], interval_trees, map_names));
     }
 
-    i64 min_location = -1;
+    i64 lowest_location = LLONG_MAX;
+    size_t total_seeds_processed = 0;
     for (auto &f: futures) {
-        if (const i64 location = f.get(); min_location == -1 || location < min_location) {
-            min_location = location;
+        const auto &[seeds_processed, location] = f.get();
+        if (location < lowest_location) {
+            lowest_location = location;
         }
+        total_seeds_processed += seeds_processed;
     }
 
-    return static_cast<int>(min_location);
+    std::cout << "Total seeds processed: " << total_seeds_processed << std::endl;
+    return lowest_location;
 }
 
 template<>
