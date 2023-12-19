@@ -1,7 +1,12 @@
 #include "puzzle/day_puzzle.hpp"
 #include "util/utils.hpp"
+
+#include <atomic>
+#include <functional>
 #include <future>
-#include <queue>
+#include <iomanip>
+#include <iostream>
+#include <numeric>
 #include <sstream>
 #include <unordered_map>
 
@@ -20,6 +25,38 @@ struct MapSection {
 using SectionMap = std::vector<MapSection>;
 using SectionsMapping = std::unordered_map<std::string, SectionMap>;
 using SeedRange = std::vector<std::pair<i64, i64>>;
+
+void displayProgressBar(const size_t current, const size_t total) {
+    constexpr int bar_width = 70;
+    const float progress = static_cast<float>(current) / total;
+
+    std::cout << "[";
+    const int pos = bar_width * progress;
+    for (int i = 0; i < bar_width; ++i) {
+        if (i < pos) std::cout << "=";
+        else if (i == pos)
+            std::cout << ">";
+        else
+            std::cout << " ";
+    }
+    std::cout << std::fixed << std::setprecision(2);
+    std::cout << "] " << progress * 100.0 << "% (" << current << "/" << total <<  ")\r";
+    std::cout.flush();
+}
+
+struct ProgressTracker {
+    std::atomic<size_t> total_processed;
+    size_t total_seeds;
+    std::mutex display_mutex;
+
+    explicit ProgressTracker(size_t total_seeds) : total_seeds(total_seeds) {}
+
+    void updateProgress(const int processed) {
+        total_processed += processed;
+        std::lock_guard lock(display_mutex);
+        displayProgressBar(total_processed, total_seeds);
+    }
+};
 
 std::vector<i64> parseSeeds(const std::string &line) {
     std::vector<i64> seeds;
@@ -97,13 +134,14 @@ i64 processSeed(const SectionsMapping &sections_mapping, const MapNames &map_nam
     return seed;
 }
 
-i64 processSeedRange(const SectionsMapping &sections_mapping, const MapNames &map_names, const i64 seed_start, const i64 length) {
+i64 processSeedRange(const SectionsMapping &sections_mapping, const MapNames &map_names, const i64 seed_start, const i64 length, ProgressTracker &progress_tracker) {
     i64 min_location = -1;
     for (i64 i = 0; i < length; ++i) {
         const i64 seed = seed_start + i;
         if (const i64 location = processSeed(sections_mapping, map_names, seed); min_location == -1 || location < min_location) {
             min_location = location;
         }
+        progress_tracker.updateProgress(1);
     }
     return min_location;
 }
@@ -134,10 +172,16 @@ int DayPuzzle<5>::solvePartTwo(PuzzleService &, const std::vector<std::string> &
                                 "water-to-light map:", "light-to-temperature map:", "temperature-to-humidity map:",
                                 "humidity-to-location map:"};
 
+    const size_t total_seeds = std::accumulate(seed_range.begin(), seed_range.end(), 0, [](i64 sum, const auto &range) {
+        return sum + range.second;
+    });
+
+    ProgressTracker tracker(total_seeds);
     std::vector<std::future<i64>> futures;
+
     for (const auto &[seed_start, length]: seed_range) {
-        futures.emplace_back(std::async(std::launch::async, [&sections_mapping, &map_names, seed_start, length] {
-            return processSeedRange(sections_mapping, map_names, seed_start, length);
+        futures.emplace_back(std::async(std::launch::async, [&sections_mapping, &map_names, seed_start, length, &tracker] {
+            return processSeedRange(sections_mapping, map_names, seed_start, length, tracker);
         }));
     }
 
