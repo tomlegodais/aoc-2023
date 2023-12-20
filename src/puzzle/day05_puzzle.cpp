@@ -6,6 +6,7 @@
 #include <ranges>
 #include <sstream>
 #include <unordered_map>
+#include <algorithm>
 
 using i64 = long long;
 using MapNames = std::vector<std::string>;
@@ -253,7 +254,6 @@ int DayPuzzle<5>::solvePartTwo(PuzzleService &, const std::vector<std::string> &
         }
     }
 
-    std::cout << "Total seeds processed: " << total_seeds_processed << std::endl;
     return lowest_location;
 }
 
