@@ -43,37 +43,33 @@ size_t calculateTotalSeeds(const SeedRange &seed_range) {
 
 std::vector<SeedRange> splitSeedRange(const SeedRange &seed_range, const size_t split_size) {
     const size_t total_seeds = calculateTotalSeeds(seed_range);
-    std::cout << "Total seed count: " << total_seeds << std::endl;
-
     const size_t seeds_per_split = total_seeds / split_size;
     const size_t remainder = total_seeds % split_size;
+
     std::vector<SeedRange> split_ranges(split_size);
-
     auto it = seed_range.begin();
-    size_t current_remmaining = it->second;
 
-    for (size_t split = 0; split < split_size; ++split) {
-        size_t seeds_in_split = split < remainder ? seeds_per_split + 1 : seeds_per_split;
-        split_ranges[split] = SeedRange();
+    i64 current_start = it->first;
+    i64 seeds_allocated = 0;
 
-        while (seeds_in_split > 0 && it != seed_range.end()) {
-            if (current_remmaining <= seeds_in_split) {
-                split_ranges[split].emplace_back(it->first, current_remmaining);
-                seeds_in_split -= current_remmaining;
+    for (size_t i = 0; i < split_size && it != seed_range.end(); ++i) {
+        size_t seeds_to_allocate = seeds_per_split + (i < remainder ? 1 : 0);
+        split_ranges[i] = SeedRange();
+
+        while (seeds_to_allocate > 0 && it != seed_range.end()) {
+            i64 range_length = std::min<i64>(seeds_to_allocate, static_cast<i64>(it->second) - seeds_allocated);
+            split_ranges[i].emplace_back(current_start, range_length);
+
+            seeds_allocated += range_length;
+            seeds_to_allocate -= range_length;
+            current_start += range_length;
+
+            if (seeds_allocated == it->second) {
                 ++it;
                 if (it != seed_range.end()) {
-                    current_remmaining = it->second;
+                    current_start = it->first;
+                    seeds_allocated = 0;
                 }
-            } else {
-                split_ranges[split].emplace_back(it->first, seeds_in_split);
-                current_remmaining -= seeds_in_split;
-                if (current_remmaining == 0) {
-                    ++it;
-                    if (it != seed_range.end()) {
-                        current_remmaining = it->second;
-                    }
-                }
-                break;
             }
         }
     }
@@ -194,11 +190,12 @@ i64 processSeed(const std::unordered_map<std::string, IntervalTree> &interval_tr
     return seed;
 }
 
-std::pair<i64, size_t> processBatch(const SeedRange &seed_range, const std::unordered_map<std::string, IntervalTree> &interval_trees, const MapNames &map_names) {
+std::atomic<size_t> total_seeds_processed;
+
+i64 processBatch(const SeedRange &seed_range, const std::unordered_map<std::string, IntervalTree> &interval_trees, const MapNames &map_names) {
     SeedGenerator seed_generator(seed_range, 5000);
     size_t actual_batch_size;
     i64 lowest_location = LLONG_MAX;
-    size_t seeds_processed = 0;
 
     while (true) {
         const i64 *seeds = seed_generator.nextBatch(actual_batch_size);
@@ -209,10 +206,10 @@ std::pair<i64, size_t> processBatch(const SeedRange &seed_range, const std::unor
             if (const i64 location = processSeed(interval_trees, map_names, seed); location < lowest_location) {
                 lowest_location = location;
             }
-            ++seeds_processed;
+            ++total_seeds_processed;
         }
     }
-    return std::make_pair(lowest_location, seeds_processed);
+    return lowest_location;
 }
 
 template<>
@@ -236,55 +233,24 @@ int DayPuzzle<5>::solvePartOne(PuzzleService &, const std::vector<std::string> &
 
 template<>
 int DayPuzzle<5>::solvePartTwo(PuzzleService &, const std::vector<std::string> &puzzle_input) {
-    std::vector<std::string> test_input = {
-            "seeds: 50 20",
-            "seed-to-soil map:",
-            "50 98 2",
-            "52 50 48",
-            "soil-to-fertilizer map:",
-            "0 15 37",
-            "37 52 2",
-            "39 0 15",
-            "fertilizer-to-water map:",
-            "49 53 8",
-            "0 11 42",
-            "42 0 7",
-            "57 7 4",
-            "water-to-light map:",
-            "88 18 7",
-            "18 25 70",
-            "light-to-temperature map:",
-            "45 77 23",
-            "81 45 19",
-            "68 64 13",
-            "temperature-to-humidity map:",
-            "0 69 1",
-            "1 0 69",
-            "humidity-to-location map:",
-            "60 56 37",
-            "56 93 4"};
-
-    const auto seed_range = parseSeedRange(test_input.front());
+    const auto seed_range = parseSeedRange(puzzle_input.front());
     const unsigned int thread_count = std::thread::hardware_concurrency();
     const auto split_range = splitSeedRange(seed_range, thread_count);
-    const auto interval_trees = parseIntervalTrees(test_input);
+    const auto interval_trees = parseIntervalTrees(puzzle_input);
     const MapNames map_names = {"seed-to-soil map", "soil-to-fertilizer map", "fertilizer-to-water map",
                                 "water-to-light map", "light-to-temperature map", "temperature-to-humidity map",
                                 "humidity-to-location map"};
 
-    std::vector<std::future<std::pair<i64, size_t>>> futures;
+    std::vector<std::future<i64>> futures;
     for (unsigned int i = 0; i < thread_count; ++i) {
         futures.push_back(std::async(std::launch::async, processBatch, split_range[i], interval_trees, map_names));
     }
 
     i64 lowest_location = LLONG_MAX;
-    size_t total_seeds_processed = 0;
     for (auto &f: futures) {
-        const auto &[seeds_processed, location] = f.get();
-        if (location < lowest_location) {
+        if (const auto &location = f.get(); location < lowest_location) {
             lowest_location = location;
         }
-        total_seeds_processed += seeds_processed;
     }
 
     std::cout << "Total seeds processed: " << total_seeds_processed << std::endl;
