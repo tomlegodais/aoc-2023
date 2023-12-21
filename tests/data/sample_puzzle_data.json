@@ -96,8 +96,11 @@
   },
   {
     "day": 6,
-    "input": [],
-    "expected_part_one": 0,
+    "input": [
+      "Time:      7  15   30",
+      "Distance:  9  40  200"
+    ],
+    "expected_part_one": 288,
     "expected_part_two": 0
   },
   {
