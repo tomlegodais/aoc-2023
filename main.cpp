@@ -19,49 +19,49 @@ using PuzzleDays = std::make_integer_sequence<int, 7>;
 using Puzzles = PuzzleTuple<PuzzleDays>::type;
 
 template<typename Puzzle>
-void printPuzzle() {
-    std::cout << Puzzle::day << ". " << Puzzle::getTitle() << std::endl;
+void print_puzzle() {
+    std::cout << Puzzle::day << ". " << Puzzle::get_title() << std::endl;
 }
 
 template<std::size_t I = 0, typename... Tp>
 std::enable_if_t<I == sizeof...(Tp), void>
-listPuzzle(std::tuple<Tp...> &) {
+list_puzzle(std::tuple<Tp...> &) {
     std::cout << std::endl;
 }
 
 template<std::size_t I = 0, typename... Tp>
 std::enable_if_t < I<sizeof...(Tp)>
-listPuzzle(std::tuple<Tp...> &t) {
-    printPuzzle<std::tuple_element_t<I, std::tuple<Tp...>>>();
-    listPuzzle<I + 1, Tp...>(t);
+list_puzzle(std::tuple<Tp...> &t) {
+    print_puzzle<std::tuple_element_t<I, std::tuple<Tp...>>>();
+    list_puzzle<I + 1, Tp...>(t);
 }
 
 template<std::size_t I = 0, typename... Tp>
 constexpr std::enable_if_t<I == sizeof...(Tp), std::set<int>>
-getPuzzleDays(std::tuple<Tp...> &) {
+get_puzzle_days(std::tuple<Tp...> &) {
     return {};
 }
 
 template<std::size_t I = 0, typename... Tp>
 constexpr std::enable_if_t < I<sizeof...(Tp), std::set<int>>
-getPuzzleDays(std::tuple<Tp...> &t) {
-    std::set<int> days = getPuzzleDays<I + 1>(t);
+get_puzzle_days(std::tuple<Tp...> &t) {
+    std::set<int> days = get_puzzle_days<I + 1>(t);
     days.insert(std::tuple_element_t<I, std::tuple<Tp...>>::day);
     return days;
 }
 
 template<int Day>
-void solvePuzzle(PuzzleService &puzzle_service) {
+void solve_puzzle(PuzzleService &puzzle_service) {
     std::cout << std::endl
               << "Solving puzzle for day " << Day << ", please wait..." << std::endl;
 
-    const auto puzzle_input = puzzle_service.readPuzzleInput(Day);
-    const auto [partOneResult, partOneTime] = utils::measureExecutionTime([&] {
-        return DayPuzzle<Day>::solvePartOne(puzzle_service, puzzle_input);
+    const auto puzzle_input = puzzle_service.read_puzzle_input(Day);
+    const auto [partOneResult, partOneTime] = utils::measure_execution_time([&] {
+        return DayPuzzle<Day>::solve_part_one(puzzle_service, puzzle_input);
     });
 
-    const auto [partTwoResult, partTwoTime] = utils::measureExecutionTime([&] {
-        return DayPuzzle<Day>::solvePartTwo(puzzle_service, puzzle_input);
+    const auto [partTwoResult, partTwoTime] = utils::measure_execution_time([&] {
+        return DayPuzzle<Day>::solve_part_two(puzzle_service, puzzle_input);
     });
 
     std::cout << "Part One: " << partOneResult << ", took " << partOneTime << " milliseconds" << std::endl;
@@ -70,23 +70,23 @@ void solvePuzzle(PuzzleService &puzzle_service) {
 
 template<std::size_t I = 0, typename... Tp>
 std::enable_if_t<I == sizeof...(Tp), void>
-solvePuzzleForDay(std::tuple<Tp...> &, int, PuzzleService &) {
+solve_puzzle_for_day(std::tuple<Tp...> &, int, PuzzleService &) {
     /* no-op */
 }
 
 template<std::size_t I = 0, typename... Tp>
 std::enable_if_t < I<sizeof...(Tp), void>
-solvePuzzleForDay(std::tuple<Tp...> &puzzles, int day, PuzzleService &puzzle_service) {
+solve_puzzle_for_day(std::tuple<Tp...> &puzzles, int day, PuzzleService &puzzle_service) {
     if constexpr (I < sizeof...(Tp)) {
         if (std::tuple_element_t<I, std::tuple<Tp...>>::day == day) {
-            solvePuzzle<std::tuple_element_t<I, std::tuple<Tp...>>::day>(puzzle_service);
+            solve_puzzle<std::tuple_element_t<I, std::tuple<Tp...>>::day>(puzzle_service);
             return;
         }
-        solvePuzzleForDay<I + 1, Tp...>(puzzles, day, puzzle_service);
+        solve_puzzle_for_day<I + 1, Tp...>(puzzles, day, puzzle_service);
     }
 }
 
-int promptForDay(const std::set<int> &days) {
+int prompt_for_day(const std::set<int> &days) {
     int day;
 
     while (true) {
@@ -110,10 +110,10 @@ int main() {
         std::cout << "===================" << std::endl;
 
         Puzzles puzzles;
-        listPuzzle(puzzles);
+        list_puzzle(puzzles);
 
-        const auto puzzle_days = getPuzzleDays(puzzles);
-        const int day = promptForDay(puzzle_days);
+        const auto puzzle_days = get_puzzle_days(puzzles);
+        const int day = prompt_for_day(puzzle_days);
         if (day == -1) {
             return 0;
         }
@@ -121,7 +121,7 @@ int main() {
         auto session = Session::init(".session");
         auto puzzle_service = PuzzleService(session);
 
-        solvePuzzleForDay(puzzles, day, puzzle_service);
+        solve_puzzle_for_day(puzzles, day, puzzle_service);
     } catch (const std::exception &e) {
         std::cerr << "Error: " << e.what() << std::endl;
         return -1;

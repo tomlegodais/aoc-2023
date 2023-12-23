@@ -1,7 +1,6 @@
 #pragma once
 
 #include <string>
-#include <utility>
 
 class Session {
     std::string value_;
@@ -13,11 +12,11 @@ public:
 
     static Session init(const std::string &file_name);
 
-    static Session fromValue(const std::string &value) {
+    static Session from_value(const std::string &value) {
         return Session(value);
     }
 
-    const std::string &getValue() {
+    const std::string &get_value() {
         return value_;
     }
 };

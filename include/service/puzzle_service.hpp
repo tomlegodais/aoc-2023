@@ -9,7 +9,7 @@ public:
 
     virtual ~PuzzleService() = default;
 
-    virtual std::vector<std::string> readPuzzleInput(int day);
+    virtual std::vector<std::string> read_puzzle_input(int day);
 
 private:
     Session &session_;

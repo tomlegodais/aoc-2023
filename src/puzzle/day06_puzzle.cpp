@@ -9,7 +9,7 @@
 using Race = std::pair<int, int>;
 using RaceMap = std::map<int, Race>;
 
-RaceMap parseRaces(const std::vector<std::string> &input) {
+RaceMap parse_races(const std::vector<std::string> &input) {
     RaceMap race_mapping;
     int line_id = 0;
 
@@ -30,8 +30,8 @@ RaceMap parseRaces(const std::vector<std::string> &input) {
 }
 
 template<>
-int DayPuzzle<6>::solvePartOne(PuzzleService &, const std::vector<std::string> &puzzle_input) {
-    const auto race_mapping = parseRaces(puzzle_input);
+int DayPuzzle<6>::solve_part_one(PuzzleService &, const std::vector<std::string> &puzzle_input) {
+    const auto race_mapping = parse_races(puzzle_input);
     std::unordered_map<int, int> winning_counts;
 
     for (const auto &[race_id, race]: race_mapping) {
@@ -62,8 +62,8 @@ T merge_integers(const T merged, const T value) {
 }
 
 template<>
-int DayPuzzle<6>::solvePartTwo(PuzzleService &, const std::vector<std::string> &puzzle_input) {
-    const auto race_mapping = parseRaces(puzzle_input);
+int DayPuzzle<6>::solve_part_two(PuzzleService &, const std::vector<std::string> &puzzle_input) {
+    const auto race_mapping = parse_races(puzzle_input);
     long long merged_time = 0, merged_distance = 0;
     for (const auto &[time, distance]: race_mapping | std::views::values) {
         merged_time = merge_integers(merged_time, static_cast<long long>(time));
@@ -84,6 +84,6 @@ int DayPuzzle<6>::solvePartTwo(PuzzleService &, const std::vector<std::string> &
 }
 
 template<>
-const char *DayPuzzle<6>::getTitle() {
+const char *DayPuzzle<6>::get_title() {
     return "Wait For It";
 }

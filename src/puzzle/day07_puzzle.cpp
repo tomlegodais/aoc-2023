@@ -11,7 +11,7 @@ public:
     explicit CardMappingStrategy(std::unordered_map<char, std::pair<std::string, int>> card_mapping)
         : card_mapping_(std::move(card_mapping)) {}
 
-    [[nodiscard]] virtual std::pair<std::string, int> getCardProperties(const char ch) const {
+    [[nodiscard]] virtual std::pair<std::string, int> get_card_properties(const char ch) const {
         if (const auto it = card_mapping_.find(ch); it != card_mapping_.end())
             return it->second;
 
@@ -45,7 +45,7 @@ struct Card {
     int strength_;
 
     explicit Card(const char ch, const CardMappingStrategy &strategy) {
-        const auto [card_value, card_strength] = strategy.getCardProperties(ch);
+        const auto [card_value, card_strength] = strategy.get_card_properties(ch);
         value_ = card_value;
         strength_ = card_strength;
     }
@@ -76,7 +76,7 @@ enum class HandType {
 class PokerHand : public Hand {
     HandType type_;
 
-    [[nodiscard]] HandType determineHandType() const {
+    [[nodiscard]] HandType determine_hand_type() const {
         std::unordered_map<char, int> frequency;
         int joker_count = 0;
         for (const auto &card: cards_) {
@@ -88,7 +88,6 @@ class PokerHand : public Hand {
         }
 
         for (int j = 0; j < joker_count; ++j) {
-
             if (auto best_use = std::ranges::max_element(frequency,
                                                          [](const auto &a, const auto &b) { return a.second < b.second; });
                 best_use != frequency.end()) {
@@ -122,7 +121,7 @@ public:
     using Hand::Hand;
 
     explicit PokerHand(const std::string &str, const CardMappingStrategy &strategy) : Hand(str, strategy) {
-        type_ = this->determineHandType();
+        type_ = this->determine_hand_type();
     }
 
     bool operator<(const PokerHand &other) const {
@@ -137,7 +136,7 @@ public:
     }
 };
 
-int solveWithStrategy(const std::vector<std::string> &puzzle_input, const CardMappingStrategy &strategy) {
+int solve_with_strategy(const std::vector<std::string> &puzzle_input, const CardMappingStrategy &strategy) {
     std::vector<PokerHand> poker_hands;
     for (const auto &line: puzzle_input) {
         poker_hands.emplace_back(line, strategy);
@@ -154,18 +153,18 @@ int solveWithStrategy(const std::vector<std::string> &puzzle_input, const CardMa
 }
 
 template<>
-int DayPuzzle<7>::solvePartOne(PuzzleService &, const std::vector<std::string> &puzzle_input) {
+int DayPuzzle<7>::solve_part_one(PuzzleService &, const std::vector<std::string> &puzzle_input) {
     const PartOneMappingStrategy strategy;
-    return solveWithStrategy(puzzle_input, strategy);
+    return solve_with_strategy(puzzle_input, strategy);
 }
 
 template<>
-int DayPuzzle<7>::solvePartTwo(PuzzleService &, const std::vector<std::string> &puzzle_input) {
+int DayPuzzle<7>::solve_part_two(PuzzleService &, const std::vector<std::string> &puzzle_input) {
     const PartTwoMappingStrategy strategy;
-    return solveWithStrategy(puzzle_input, strategy);
+    return solve_with_strategy(puzzle_input, strategy);
 }
 
 template<>
-const char *DayPuzzle<7>::getTitle() {
+const char *DayPuzzle<7>::get_title() {
     return "Scratchcards";
 }

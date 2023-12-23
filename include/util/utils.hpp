@@ -9,7 +9,7 @@
 
 namespace utils {
     template<typename Func>
-    std::pair<decltype(std::declval<Func>()()), long long> measureExecutionTime(Func func) {
+    std::pair<decltype(std::declval<Func>()()), long long> measure_execution_time(Func func) {
         const auto start = std::chrono::high_resolution_clock::now();
         auto result = func();
         const auto stop = std::chrono::high_resolution_clock::now();
@@ -17,7 +17,7 @@ namespace utils {
         return std::make_pair(result, duration.count());
     }
 
-    inline std::vector<std::string> splitOnNewline(const std::string &str) {
+    inline std::vector<std::string> split_on_newline(const std::string &str) {
         std::vector<std::string> result;
         std::istringstream iss(str);
         for (std::string line; std::getline(iss, line);) {
@@ -31,9 +31,9 @@ namespace utils {
     }
 
     template<typename K, typename V>
-    V getOrDefault(const std::map<K, V> &map, const K &key, const V &defaultValue) {
+    V get_or_default(const std::map<K, V> &map, const K &key, const V &defaultValue) {
         const auto it = map.find(key);
-        if (it == map.end()) {
+        if (it == map.end_()) {
             return defaultValue;
         }
         return it->second;

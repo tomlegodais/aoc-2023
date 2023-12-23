@@ -10,7 +10,7 @@ const std::map<std::string, int> color_mapping = {
         {"green", 13},
         {"blue", 14}};
 
-std::vector<std::string> parseGroups(const std::string &line) {
+std::vector<std::string> parse_groups(const std::string &line) {
     std::istringstream iss(line.substr(line.find(':') + 1));
     std::vector<std::string> groups;
     std::string group;
@@ -22,7 +22,7 @@ std::vector<std::string> parseGroups(const std::string &line) {
     return groups;
 }
 
-std::map<std::string, int> countColors(const std::string &group) {
+std::map<std::string, int> count_colors(const std::string &group) {
     std::map<std::string, int> color_counts;
     std::istringstream group_stream(group);
     std::string pair;
@@ -39,8 +39,8 @@ std::map<std::string, int> countColors(const std::string &group) {
     return color_counts;
 }
 
-bool isGroupValid(const std::string &group) {
-    const auto &color_counts = countColors(group);
+bool is_group_valid(const std::string &group) {
+    const auto &color_counts = count_colors(group);
     return std::ranges::all_of(color_mapping.begin(), color_mapping.end(), [&color_counts](const auto &pair) {
         const auto &[color, max] = pair;
         auto it = color_counts.find(color);
@@ -48,7 +48,7 @@ bool isGroupValid(const std::string &group) {
     });
 }
 
-std::vector<int> getHighestValues(const std::map<std::string, std::vector<int>> &total_counts) {
+std::vector<int> get_highest_values(const std::map<std::string, std::vector<int>> &total_counts) {
     std::vector<int> highest_values;
 
     for (const auto &counts: total_counts | std::views::values) {
@@ -61,15 +61,15 @@ std::vector<int> getHighestValues(const std::map<std::string, std::vector<int>> 
 }
 
 template<>
-int DayPuzzle<2>::solvePartOne(PuzzleService &, const std::vector<std::string> &puzzle_input) {
+int DayPuzzle<2>::solve_part_one(PuzzleService &, const std::vector<std::string> &puzzle_input) {
     int sum = 0;
 
     for (const auto &line: puzzle_input) {
-        auto groups = parseGroups(line);
+        auto groups = parse_groups(line);
         bool possible = true;
 
         for (const auto &group: groups) {
-            if (isGroupValid(group)) continue;
+            if (is_group_valid(group)) continue;
 
             possible = false;
             break;
@@ -83,20 +83,20 @@ int DayPuzzle<2>::solvePartOne(PuzzleService &, const std::vector<std::string> &
 }
 
 template<>
-int DayPuzzle<2>::solvePartTwo(PuzzleService &, const std::vector<std::string> &puzzle_input) {
+int DayPuzzle<2>::solve_part_two(PuzzleService &, const std::vector<std::string> &puzzle_input) {
     int sum = 0;
 
     for (const auto &line: puzzle_input) {
-        auto groups = parseGroups(line);
+        auto groups = parse_groups(line);
         std::map<std::string, std::vector<int>> total_counts;
 
         for (const auto &group: groups) {
-            for (const auto &[color, count]: countColors(group)) {
+            for (const auto &[color, count]: count_colors(group)) {
                 total_counts[color].push_back(count);
             }
         }
 
-        const auto &highest_values = getHighestValues(total_counts);
+        const auto &highest_values = get_highest_values(total_counts);
         const int power = std::accumulate(highest_values.begin(), highest_values.end(), 1, std::multiplies());
 
         sum += power;
@@ -105,6 +105,6 @@ int DayPuzzle<2>::solvePartTwo(PuzzleService &, const std::vector<std::string> &
 }
 
 template<>
-const char *DayPuzzle<2>::getTitle() {
+const char *DayPuzzle<2>::get_title() {
     return "Cube Conundrum";
 }

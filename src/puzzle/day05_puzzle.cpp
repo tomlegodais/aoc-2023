@@ -12,7 +12,7 @@ using i64 = long long;
 using MapNames = std::vector<std::string>;
 using SeedRange = std::vector<std::pair<i64, i64>>;
 
-std::vector<i64> parseSeeds(const std::string &line) {
+std::vector<i64> parse_seeds(const std::string &line) {
     std::vector<i64> seeds;
     const auto str = line.substr(line.find("seeds: ") + 7);
     std::stringstream ss(str);
@@ -23,7 +23,7 @@ std::vector<i64> parseSeeds(const std::string &line) {
     return seeds;
 }
 
-SeedRange parseSeedRange(const std::string &line) {
+SeedRange parse_seed_range(const std::string &line) {
     SeedRange seed_range;
     const auto str = line.substr(line.find("seeds: ") + 7);
     std::stringstream ss(str);
@@ -34,7 +34,7 @@ SeedRange parseSeedRange(const std::string &line) {
     return seed_range;
 }
 
-size_t calculateTotalSeeds(const SeedRange &seed_range) {
+size_t calculate_total_seeds(const SeedRange &seed_range) {
     size_t total = 0;
     for (const auto &length: seed_range | std::views::values) {
         total += static_cast<size_t>(length);
@@ -42,8 +42,8 @@ size_t calculateTotalSeeds(const SeedRange &seed_range) {
     return total;
 }
 
-std::vector<SeedRange> splitSeedRange(const SeedRange &seed_range, const size_t split_size) {
-    const size_t total_seeds = calculateTotalSeeds(seed_range);
+std::vector<SeedRange> split_seed_range(const SeedRange &seed_range, const size_t split_size) {
+    const size_t total_seeds = calculate_total_seeds(seed_range);
     const size_t seeds_per_split = total_seeds / split_size;
     const size_t remainder = total_seeds % split_size;
 
@@ -78,47 +78,47 @@ std::vector<SeedRange> splitSeedRange(const SeedRange &seed_range, const size_t 
 }
 
 class SeedGenerator {
-    std::vector<std::pair<i64, i64>>::const_iterator current;
-    std::vector<std::pair<i64, i64>>::const_iterator end;
-    i64 current_seed;
-    i64 range_end;
-    size_t batch_size;
-    std::unique_ptr<i64[]> batch_array;
+    std::vector<std::pair<i64, i64>>::const_iterator current_;
+    std::vector<std::pair<i64, i64>>::const_iterator end_;
+    i64 current_seed_;
+    i64 range_end_;
+    size_t batch_size_;
+    std::unique_ptr<i64[]> batch_array_;
 
 public:
     explicit SeedGenerator(const SeedRange &seed_range, const size_t batch_size)
-        : current(seed_range.begin()), end(seed_range.end()),
-          current_seed(current->first), range_end(current->first + current->second),
-          batch_size(batch_size), batch_array(std::make_unique<i64[]>(batch_size)) {}
+        : current_(seed_range.begin()), end_(seed_range.end()),
+          current_seed_(current_->first), range_end_(current_->first + current_->second),
+          batch_size_(batch_size), batch_array_(std::make_unique<i64[]>(batch_size)) {}
 
     SeedGenerator(const SeedGenerator &) = delete;
     SeedGenerator &operator=(const SeedGenerator &) = delete;
 
-    i64 *nextBatch(size_t &actual_batch_size) {
+    i64 *next_batch(size_t &actual_batch_size) {
         actual_batch_size = 0;
 
-        while (actual_batch_size < batch_size) {
-            if (current == end) break;
+        while (actual_batch_size < batch_size_) {
+            if (current_ == end_) break;
 
-            i64 remaining_in_range = range_end - current_seed;
-            i64 space_in_batch = batch_size - actual_batch_size;
+            i64 remaining_in_range = range_end_ - current_seed_;
+            i64 space_in_batch = batch_size_ - actual_batch_size;
             const i64 seeds_to_add = std::min(remaining_in_range, space_in_batch);
 
             for (i64 i = 0; i < seeds_to_add; ++i) {
-                batch_array[actual_batch_size++] = current_seed + i;
+                batch_array_[actual_batch_size++] = current_seed_ + i;
             }
 
-            current_seed += seeds_to_add;
-            if (current_seed >= range_end) {
-                ++current;
-                if (current != end) {
-                    current_seed = current->first;
-                    range_end = current_seed + current->second;
+            current_seed_ += seeds_to_add;
+            if (current_seed_ >= range_end_) {
+                ++current_;
+                if (current_ != end_) {
+                    current_seed_ = current_->first;
+                    range_end_ = current_seed_ + current_->second;
                 }
             }
         }
 
-        return actual_batch_size > 0 ? batch_array.get() : nullptr;
+        return actual_batch_size > 0 ? batch_array_.get() : nullptr;
     }
 };
 
@@ -135,17 +135,17 @@ class IntervalTree {
     std::vector<Interval> intervals_;
 
 public:
-    void addInterval(i64 start, const i64 length, const i64 destination_start) {
+    void add_interval(i64 start, const i64 length, const i64 destination_start) {
         intervals_.emplace_back(start, start + length, destination_start - start);
     }
 
-    void buildTree() {
+    void build_tree() {
         std::ranges::sort(intervals_, [](const Interval &a, const Interval &b) {
             return a.start < b.start;
         });
     }
 
-    [[nodiscard]] i64 mapValue(const i64 value) const {
+    [[nodiscard]] i64 map_value(const i64 value) const {
         int low = 0, high = intervals_.size() - 1;
         while (low <= high) {
             const int mid = low + (high - low) / 2;
@@ -161,7 +161,7 @@ public:
     }
 };
 
-std::unordered_map<std::string, IntervalTree> parseIntervalTrees(const std::vector<std::string> &input) {
+std::unordered_map<std::string, IntervalTree> parse_interval_trees(const std::vector<std::string> &input) {
     std::string current_map;
     std::unordered_map<std::string, IntervalTree> interval_trees;
     for (const auto &line: input) {
@@ -172,51 +172,48 @@ std::unordered_map<std::string, IntervalTree> parseIntervalTrees(const std::vect
             std::istringstream iss(line);
             i64 desination_start, source_start;
             if (i64 length; iss >> desination_start >> source_start >> length) {
-                interval_trees[current_map].addInterval(source_start, length, desination_start);
+                interval_trees[current_map].add_interval(source_start, length, desination_start);
             }
         }
     }
 
     for (auto &tree: interval_trees | std::views::values) {
-        tree.buildTree();
+        tree.build_tree();
     }
 
     return interval_trees;
 }
 
-i64 processSeed(const std::unordered_map<std::string, IntervalTree> &interval_trees, const MapNames &map_names, i64 seed) {
+i64 process_seed(const std::unordered_map<std::string, IntervalTree> &interval_trees, const MapNames &map_names, i64 seed) {
     for (const auto &map_name: map_names) {
-        seed = interval_trees.at(map_name).mapValue(seed);
+        seed = interval_trees.at(map_name).map_value(seed);
     }
     return seed;
 }
 
-std::atomic<size_t> total_seeds_processed;
-
-i64 processBatch(const SeedRange &seed_range, const std::unordered_map<std::string, IntervalTree> &interval_trees, const MapNames &map_names) {
+i64 process_batch(const SeedRange &seed_range, const std::unordered_map<std::string, IntervalTree> &interval_trees, const MapNames &map_names) {
     SeedGenerator seed_generator(seed_range, 5000);
     size_t actual_batch_size;
     i64 lowest_location = LLONG_MAX;
 
     while (true) {
-        const i64 *seeds = seed_generator.nextBatch(actual_batch_size);
+        const i64 *seeds = seed_generator.next_batch(actual_batch_size);
         if (actual_batch_size == 0) break;
 
         for (size_t i = 0; i < actual_batch_size; ++i) {
             const i64 seed = seeds[i];
-            if (const i64 location = processSeed(interval_trees, map_names, seed); location < lowest_location) {
+            if (const i64 location = process_seed(interval_trees, map_names, seed); location < lowest_location) {
                 lowest_location = location;
             }
-            ++total_seeds_processed;
         }
     }
     return lowest_location;
 }
 
 template<>
-int DayPuzzle<5>::solvePartOne(PuzzleService &, const std::vector<std::string> &puzzle_input) {
-    const auto seeds = parseSeeds(puzzle_input.front());
-    const auto interval_trees = parseIntervalTrees(puzzle_input);
+int DayPuzzle<5>::solve_part_one(PuzzleService &, const std::vector<std::string> &puzzle_input) {
+    const auto seeds = parse_seeds(puzzle_input.front());
+    const auto interval_trees = parse_interval_trees(puzzle_input);
     const MapNames map_names = {"seed-to-soil map", "soil-to-fertilizer map", "fertilizer-to-water map",
                                 "water-to-light map", "light-to-temperature map", "temperature-to-humidity map",
                                 "humidity-to-location map"};
@@ -224,7 +221,7 @@ int DayPuzzle<5>::solvePartOne(PuzzleService &, const std::vector<std::string> &
 
     i64 lowest_location = LLONG_MAX;
     for (const auto &seed: seeds) {
-        if (const i64 location = processSeed(interval_trees, map_names, seed); location < lowest_location) {
+        if (const i64 location = process_seed(interval_trees, map_names, seed); location < lowest_location) {
             lowest_location = location;
         }
     }
@@ -233,18 +230,18 @@ int DayPuzzle<5>::solvePartOne(PuzzleService &, const std::vector<std::string> &
 }
 
 template<>
-int DayPuzzle<5>::solvePartTwo(PuzzleService &, const std::vector<std::string> &puzzle_input) {
-    const auto seed_range = parseSeedRange(puzzle_input.front());
+int DayPuzzle<5>::solve_part_two(PuzzleService &, const std::vector<std::string> &puzzle_input) {
+    const auto seed_range = parse_seed_range(puzzle_input.front());
     const unsigned int thread_count = std::thread::hardware_concurrency();
-    const auto split_range = splitSeedRange(seed_range, thread_count);
-    const auto interval_trees = parseIntervalTrees(puzzle_input);
+    const auto split_range = split_seed_range(seed_range, thread_count);
+    const auto interval_trees = parse_interval_trees(puzzle_input);
     const MapNames map_names = {"seed-to-soil map", "soil-to-fertilizer map", "fertilizer-to-water map",
                                 "water-to-light map", "light-to-temperature map", "temperature-to-humidity map",
                                 "humidity-to-location map"};
 
     std::vector<std::future<i64>> futures;
     for (unsigned int i = 0; i < thread_count; ++i) {
-        futures.push_back(std::async(std::launch::async, processBatch, split_range[i], interval_trees, map_names));
+        futures.push_back(std::async(std::launch::async, process_batch, split_range[i], interval_trees, map_names));
     }
 
     i64 lowest_location = LLONG_MAX;
@@ -258,6 +255,6 @@ int DayPuzzle<5>::solvePartTwo(PuzzleService &, const std::vector<std::string> &
 }
 
 template<>
-const char *DayPuzzle<5>::getTitle() {
+const char *DayPuzzle<5>::get_title() {
     return "If You Give A Seed A Fertilizer";
 }

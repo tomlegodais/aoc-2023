@@ -17,7 +17,7 @@ struct ScratchCard {
     }
 };
 
-std::pair<std::vector<int>, std::vector<int>> extractNumbers(const std::string &str) {
+std::pair<std::vector<int>, std::vector<int>> extract_numbers(const std::string &str) {
     const auto start_of_numbers = str.find(':');
     if (start_of_numbers == std::string::npos) {
         return {};
@@ -48,10 +48,10 @@ std::pair<std::vector<int>, std::vector<int>> extractNumbers(const std::string &
 }
 
 template<>
-int DayPuzzle<4>::solvePartOne(PuzzleService &, const std::vector<std::string> &puzzle_input) {
+int DayPuzzle<4>::solve_part_one(PuzzleService &, const std::vector<std::string> &puzzle_input) {
     std::vector<ScratchCard> scratch_cards;
     for (int card_id = 1; card_id <= puzzle_input.size(); ++card_id) {
-        auto [left_numbers, right_numbers] = extractNumbers(puzzle_input[card_id - 1]);
+        auto [left_numbers, right_numbers] = extract_numbers(puzzle_input[card_id - 1]);
         scratch_cards.emplace_back(card_id, left_numbers, right_numbers);
     }
 
@@ -65,12 +65,12 @@ int DayPuzzle<4>::solvePartOne(PuzzleService &, const std::vector<std::string> &
 }
 
 template<>
-int DayPuzzle<4>::solvePartTwo(PuzzleService &, const std::vector<std::string> &puzzle_input) {
+int DayPuzzle<4>::solve_part_two(PuzzleService &, const std::vector<std::string> &puzzle_input) {
     std::vector<ScratchCard> scratch_cards;
     std::queue<ScratchCard> card_queue;
 
     for (int card_id = 1; card_id <= puzzle_input.size(); ++card_id) {
-        auto [left_numbers, right_numbers] = extractNumbers(puzzle_input[card_id - 1]);
+        auto [left_numbers, right_numbers] = extract_numbers(puzzle_input[card_id - 1]);
         ScratchCard scratch_card(card_id, left_numbers, right_numbers);
 
         scratch_cards.emplace_back(scratch_card);
@@ -93,6 +93,6 @@ int DayPuzzle<4>::solvePartTwo(PuzzleService &, const std::vector<std::string> &
 }
 
 template<>
-const char *DayPuzzle<4>::getTitle() {
+const char *DayPuzzle<4>::get_title() {
     return "Scratchcards";
 }
