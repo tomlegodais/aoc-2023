@@ -1,8 +1,6 @@
 #include "puzzle/day_puzzle.hpp"
-
 #include <iostream>
 #include <numeric>
-#include <ranges>
 #include <sstream>
 #include <unordered_map>
 
@@ -36,11 +34,13 @@ int DayPuzzle<6>::solvePartOne(PuzzleService &, const std::vector<std::string> &
 
     for (const auto &[race_id, race]: race_mapping) {
         int current_speed = 0;
-        const auto &[distance, time] = race;
+        const auto &[time, distance] = race;
 
-        for (int i = 0; i < distance; ++i) {
-            const int remaining_time = distance - current_speed;
-            if (const int distance_traveled = current_speed * remaining_time; distance_traveled > time) {
+        std::cout << "distance: " << distance << ", time: " << time << std::endl;
+
+        for (int i = 0; i < time; ++i) {
+            const int remaining_time = time - current_speed;
+            if (const int distance_traveled = current_speed * remaining_time; distance_traveled > distance) {
                 winning_counts[race_id]++;
             }
 
@@ -54,6 +54,8 @@ int DayPuzzle<6>::solvePartOne(PuzzleService &, const std::vector<std::string> &
 
 template<>
 int DayPuzzle<6>::solvePartTwo(PuzzleService &, const std::vector<std::string> &puzzle_input) {
+    const auto race_mapping = parseRaces(puzzle_input);
+
     return 0;
 }
 
