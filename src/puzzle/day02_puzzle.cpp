@@ -61,7 +61,7 @@ std::vector<int> get_highest_values(const std::map<std::string, std::vector<int>
 }
 
 template<>
-int DayPuzzle<2>::solve_part_one(PuzzleService &, const std::vector<std::string> &puzzle_input) {
+PuzzleResult DayPuzzle<2>::solve_part_one(PuzzleService &, const std::vector<std::string> &puzzle_input) {
     int sum = 0;
 
     for (const auto &line: puzzle_input) {
@@ -83,7 +83,7 @@ int DayPuzzle<2>::solve_part_one(PuzzleService &, const std::vector<std::string>
 }
 
 template<>
-int DayPuzzle<2>::solve_part_two(PuzzleService &, const std::vector<std::string> &puzzle_input) {
+PuzzleResult DayPuzzle<2>::solve_part_two(PuzzleService &, const std::vector<std::string> &puzzle_input) {
     int sum = 0;
 
     for (const auto &line: puzzle_input) {

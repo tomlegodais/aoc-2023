@@ -1,7 +1,6 @@
 #pragma once
 
 #include <chrono>
-#include <map>
 #include <sstream>
 #include <string>
 #include <utility>
@@ -28,14 +27,5 @@ namespace utils {
             result.push_back(line);
         }
         return result;
-    }
-
-    template<typename K, typename V>
-    V get_or_default(const std::map<K, V> &map, const K &key, const V &defaultValue) {
-        const auto it = map.find(key);
-        if (it == map.end_()) {
-            return defaultValue;
-        }
-        return it->second;
     }
 }// namespace utils

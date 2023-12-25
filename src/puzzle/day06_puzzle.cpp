@@ -30,7 +30,7 @@ RaceMap parse_races(const std::vector<std::string> &input) {
 }
 
 template<>
-int DayPuzzle<6>::solve_part_one(PuzzleService &, const std::vector<std::string> &puzzle_input) {
+PuzzleResult DayPuzzle<6>::solve_part_one(PuzzleService &, const std::vector<std::string> &puzzle_input) {
     const auto race_mapping = parse_races(puzzle_input);
     std::unordered_map<int, int> winning_counts;
 
@@ -62,7 +62,7 @@ T merge_integers(const T merged, const T value) {
 }
 
 template<>
-int DayPuzzle<6>::solve_part_two(PuzzleService &, const std::vector<std::string> &puzzle_input) {
+PuzzleResult DayPuzzle<6>::solve_part_two(PuzzleService &, const std::vector<std::string> &puzzle_input) {
     const auto race_mapping = parse_races(puzzle_input);
     long long merged_time = 0, merged_distance = 0;
     for (const auto &[time, distance]: race_mapping | std::views::values) {

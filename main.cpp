@@ -6,6 +6,7 @@
 #include <limits>
 #include <set>
 #include <tuple>
+#include <variant>
 
 template<typename Seq>
 struct PuzzleTuple;
@@ -15,7 +16,7 @@ struct PuzzleTuple<std::integer_sequence<int, Days...>> {
     using type = std::tuple<DayPuzzle<Days + 1>...>;
 };
 
-using PuzzleDays = std::make_integer_sequence<int, 7>;
+using PuzzleDays = std::make_integer_sequence<int, 8>;
 using Puzzles = PuzzleTuple<PuzzleDays>::type;
 
 template<typename Puzzle>
@@ -51,21 +52,32 @@ get_puzzle_days(std::tuple<Tp...> &t) {
 }
 
 template<int Day>
+void print_result(PuzzleService &puzzle_service,
+                  const std::vector<std::string> &puzzle_input,
+                  PuzzleResult (DayPuzzle<Day>::*solve)(PuzzleService &, const std::vector<std::string> &),
+                  const std::string &part) {
+    const auto [result, time] = utils::measure_execution_time([&] {
+        return (DayPuzzle<Day>().*solve)(puzzle_service, puzzle_input);
+    });
+
+    std::visit([&](auto &&arg) { std::cout << part << ": " << arg; }, result);
+    std::cout << " (" << time << "ms)" << std::endl;
+}
+
+template<int Day>
 void solve_puzzle(PuzzleService &puzzle_service) {
     std::cout << std::endl
               << "Solving puzzle for day " << Day << ", please wait..." << std::endl;
 
     const auto puzzle_input = puzzle_service.read_puzzle_input(Day);
-    const auto [partOneResult, partOneTime] = utils::measure_execution_time([&] {
-        return DayPuzzle<Day>::solve_part_one(puzzle_service, puzzle_input);
-    });
+    constexpr PuzzleResult (DayPuzzle<Day>::*solves[])(PuzzleService &, const std::vector<std::string> &) = {
+        &DayPuzzle<Day>::solve_part_one,
+        &DayPuzzle<Day>::solve_part_two
+    };
 
-    const auto [partTwoResult, partTwoTime] = utils::measure_execution_time([&] {
-        return DayPuzzle<Day>::solve_part_two(puzzle_service, puzzle_input);
-    });
-
-    std::cout << "Part One: " << partOneResult << ", took " << partOneTime << " milliseconds" << std::endl;
-    std::cout << "Part Two: " << partTwoResult << ", took " << partTwoTime << " milliseconds" << std::endl;
+    for (const auto &solve: solves) {
+        print_result(puzzle_service, puzzle_input, solve, solve == solves[0] ? "Part One" : "Part Two");
+    }
 }
 
 template<std::size_t I = 0, typename... Tp>

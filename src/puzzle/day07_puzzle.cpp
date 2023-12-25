@@ -138,6 +138,8 @@ public:
 
 int solve_with_strategy(const std::vector<std::string> &puzzle_input, const CardMappingStrategy &strategy) {
     std::vector<PokerHand> poker_hands;
+    poker_hands.reserve(puzzle_input.size());
+
     for (const auto &line: puzzle_input) {
         poker_hands.emplace_back(line, strategy);
     }
@@ -153,13 +155,13 @@ int solve_with_strategy(const std::vector<std::string> &puzzle_input, const Card
 }
 
 template<>
-int DayPuzzle<7>::solve_part_one(PuzzleService &, const std::vector<std::string> &puzzle_input) {
+PuzzleResult DayPuzzle<7>::solve_part_one(PuzzleService &, const std::vector<std::string> &puzzle_input) {
     const PartOneMappingStrategy strategy;
     return solve_with_strategy(puzzle_input, strategy);
 }
 
 template<>
-int DayPuzzle<7>::solve_part_two(PuzzleService &, const std::vector<std::string> &puzzle_input) {
+PuzzleResult DayPuzzle<7>::solve_part_two(PuzzleService &, const std::vector<std::string> &puzzle_input) {
     const PartTwoMappingStrategy strategy;
     return solve_with_strategy(puzzle_input, strategy);
 }

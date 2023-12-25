@@ -3,7 +3,7 @@
 #include <map>
 
 template<>
-int DayPuzzle<1>::solve_part_one(PuzzleService &, const std::vector<std::string> &puzzle_input) {
+PuzzleResult DayPuzzle<1>::solve_part_one(PuzzleService &, const std::vector<std::string> &puzzle_input) {
     int sum = 0;
 
     for (const auto &line: puzzle_input) {
@@ -22,18 +22,18 @@ int DayPuzzle<1>::solve_part_one(PuzzleService &, const std::vector<std::string>
 }
 
 template<>
-int DayPuzzle<1>::solve_part_two(PuzzleService &, const std::vector<std::string> &puzzle_input) {
+PuzzleResult DayPuzzle<1>::solve_part_two(PuzzleService &, const std::vector<std::string> &puzzle_input) {
     const std::map<std::string, char> number_mapping = {
-        {"one", 1},
-        {"two", 2},
-        {"three", 3},
-        {"four", 4},
-        {"five", 5},
-        {"six", 6},
-        {"seven", 7},
-        {"eight", 8},
-        {"nine", 9},
-};
+            {"one", 1},
+            {"two", 2},
+            {"three", 3},
+            {"four", 4},
+            {"five", 5},
+            {"six", 6},
+            {"seven", 7},
+            {"eight", 8},
+            {"nine", 9},
+    };
 
     int sum = 0;
     for (const auto &line: puzzle_input) {

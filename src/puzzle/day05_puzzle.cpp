@@ -211,7 +211,7 @@ i64 process_batch(const SeedRange &seed_range, const std::unordered_map<std::str
 }
 
 template<>
-int DayPuzzle<5>::solve_part_one(PuzzleService &, const std::vector<std::string> &puzzle_input) {
+PuzzleResult DayPuzzle<5>::solve_part_one(PuzzleService &, const std::vector<std::string> &puzzle_input) {
     const auto seeds = parse_seeds(puzzle_input.front());
     const auto interval_trees = parse_interval_trees(puzzle_input);
     const MapNames map_names = {"seed-to-soil map", "soil-to-fertilizer map", "fertilizer-to-water map",
@@ -230,7 +230,7 @@ int DayPuzzle<5>::solve_part_one(PuzzleService &, const std::vector<std::string>
 }
 
 template<>
-int DayPuzzle<5>::solve_part_two(PuzzleService &, const std::vector<std::string> &puzzle_input) {
+PuzzleResult DayPuzzle<5>::solve_part_two(PuzzleService &, const std::vector<std::string> &puzzle_input) {
     const auto seed_range = parse_seed_range(puzzle_input.front());
     const unsigned int thread_count = std::thread::hardware_concurrency();
     const auto split_range = split_seed_range(seed_range, thread_count);

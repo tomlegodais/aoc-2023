@@ -7,19 +7,31 @@
 
 using testing::NiceMock;
 using json = nlohmann::json;
-using TestFunction = std::function<void(const std::vector<std::string> &, const std::vector<std::string> &, int, int, PuzzleService &)>;
+using TestFunction = std::function<void(const std::vector<std::string> &, const std::vector<std::string> &, PuzzleResult, PuzzleResult, PuzzleService &)>;
+
+void assert_puzzle_result(const PuzzleResult &result, const PuzzleResult &expected) {
+    if (std::holds_alternative<int>(expected) && std::holds_alternative<int>(result)) {
+        ASSERT_EQ(std::get<int>(result), std::get<int>(expected));
+    } else if (std::holds_alternative<long long>(expected) && std::holds_alternative<long long>(result)) {
+        ASSERT_EQ(std::get<long long>(result), std::get<long long>(expected));
+    } else {
+        FAIL() << "Expected result type does not match actual result type.";
+    }
+}
 
 template<int Day>
 void test_day_puzzle(const std::vector<std::string> &input,
                      const std::vector<std::string> &alt_input,
-                     const int expected_part_one,
-                     const int expected_part_two,
+                     const PuzzleResult expected_part_one,
+                     const PuzzleResult expected_part_two,
                      PuzzleService &puzzle_service) {
-    const int partOne = DayPuzzle<Day>::solve_part_one(puzzle_service, input);
-    ASSERT_EQ(partOne, expected_part_one);
+    DayPuzzle<Day> day_puzzle;
 
-    const int partTwo = DayPuzzle<Day>::solve_part_two(puzzle_service, alt_input);
-    ASSERT_EQ(partTwo, expected_part_two);
+    const PuzzleResult part_one = day_puzzle.solve_part_one(puzzle_service, input);
+    const PuzzleResult part_two = day_puzzle.solve_part_two(puzzle_service, alt_input);
+
+    assert_puzzle_result(part_one, expected_part_one);
+    assert_puzzle_result(part_two, expected_part_two);
 }
 
 void populate_test_function_map(std::map<int, TestFunction> &) {}
@@ -39,9 +51,9 @@ std::map<int, TestFunction> map_test_functions(std::integer_sequence<int, Days..
     return test_map;
 }
 
-class DayPuzzleTest : public testing::TestWithParam<std::tuple<int, std::vector<std::string>, std::vector<std::string>, int, int>> {
+class DayPuzzleTest : public testing::TestWithParam<std::tuple<int, std::vector<std::string>, std::vector<std::string>, PuzzleResult, PuzzleResult>> {
 protected:
-    static inline std::map<int, TestFunction> test_function_map = map_test_functions(std::make_integer_sequence<int, 7>{});
+    static inline std::map<int, TestFunction> test_function_map = map_test_functions(std::make_integer_sequence<int, 8>{});
 
     Session session_mock_;
     NiceMock<PuzzleServiceMock> puzzle_service_mock_;
@@ -59,18 +71,25 @@ TEST_P(DayPuzzleTest, SolvePuzzle) {
     }
 }
 
-std::vector<std::tuple<int, std::vector<std::string>, std::vector<std::string>, int, int>> parse_json() {
+std::vector<std::tuple<int, std::vector<std::string>, std::vector<std::string>, PuzzleResult, PuzzleResult>> parse_json() {
+    std::map<std::string, std::function<PuzzleResult(const json &)>> conversion_map;
+    conversion_map["int"] = [](const json &j) { return j.get<int>(); };
+    conversion_map["long long"] = [](const json &j) { return j.get<long long>(); };
+
     std::ifstream file("tests/data/sample_puzzle_data.json");
     json j;
     file >> j;
 
-    std::vector<std::tuple<int, std::vector<std::string>, std::vector<std::string>, int, int>> test_cases;
+    std::vector<std::tuple<int, std::vector<std::string>, std::vector<std::string>, PuzzleResult, PuzzleResult>> test_cases;
     for (auto &item: j) {
         int day = item["day"];
         std::vector<std::string> input = item["input"];
         std::vector<std::string> alt_input = item.value("alt_input", input);
-        int expected_part_one = item["expected_part_one"];
-        int expected_part_two = item["expected_part_two"];
+        std::string expected_part_one_type = item.value("expected_part_one_type", "int"),
+                    expected_part_two_type = item.value("expected_part_two_type", "int");
+
+        PuzzleResult expected_part_one = conversion_map[expected_part_one_type](item["expected_part_one"]),
+                     expected_part_two = conversion_map[expected_part_two_type](item["expected_part_two"]);
 
         test_cases.emplace_back(day, input, alt_input, expected_part_one, expected_part_two);
     }

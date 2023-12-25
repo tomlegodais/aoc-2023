@@ -36,7 +36,7 @@ int find_part_number(const std::vector<std::string> &schematic, const int x, int
 }
 
 template<>
-int DayPuzzle<3>::solve_part_one(PuzzleService &, const std::vector<std::string> &puzzle_input) {
+PuzzleResult DayPuzzle<3>::solve_part_one(PuzzleService &, const std::vector<std::string> &puzzle_input) {
     int total_sum = 0;
 
     for (int i = 0; i < puzzle_input.size(); i++) {
@@ -62,7 +62,7 @@ int DayPuzzle<3>::solve_part_one(PuzzleService &, const std::vector<std::string>
 }
 
 template<>
-int DayPuzzle<3>::solve_part_two(PuzzleService &, const std::vector<std::string> &puzzle_input) {
+PuzzleResult DayPuzzle<3>::solve_part_two(PuzzleService &, const std::vector<std::string> &puzzle_input) {
     int total_sum = 0;
 
     for (int i = 0; i < puzzle_input.size(); i++) {

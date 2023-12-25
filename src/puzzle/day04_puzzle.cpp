@@ -48,7 +48,7 @@ std::pair<std::vector<int>, std::vector<int>> extract_numbers(const std::string 
 }
 
 template<>
-int DayPuzzle<4>::solve_part_one(PuzzleService &, const std::vector<std::string> &puzzle_input) {
+PuzzleResult DayPuzzle<4>::solve_part_one(PuzzleService &, const std::vector<std::string> &puzzle_input) {
     std::vector<ScratchCard> scratch_cards;
     for (int card_id = 1; card_id <= puzzle_input.size(); ++card_id) {
         auto [left_numbers, right_numbers] = extract_numbers(puzzle_input[card_id - 1]);
@@ -65,7 +65,7 @@ int DayPuzzle<4>::solve_part_one(PuzzleService &, const std::vector<std::string>
 }
 
 template<>
-int DayPuzzle<4>::solve_part_two(PuzzleService &, const std::vector<std::string> &puzzle_input) {
+PuzzleResult DayPuzzle<4>::solve_part_two(PuzzleService &, const std::vector<std::string> &puzzle_input) {
     std::vector<ScratchCard> scratch_cards;
     std::queue<ScratchCard> card_queue;
 

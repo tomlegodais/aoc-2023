@@ -92,7 +92,9 @@
       "56 93 4"
     ],
     "expected_part_one": 35,
-    "expected_part_two": 46
+    "expected_part_one_type": "long long",
+    "expected_part_two": 46,
+    "expected_part_two_type": "long long"
   },
   {
     "day": 6,
@@ -101,7 +103,8 @@
       "Distance:  9  40  200"
     ],
     "expected_part_one": 288,
-    "expected_part_two": 71503
+    "expected_part_two": 71503,
+    "expected_part_two_type": "long long"
   },
   {
     "day": 7,
@@ -114,5 +117,32 @@
     ],
     "expected_part_one": 6440,
     "expected_part_two": 5905
+  },
+  {
+    "day": 8,
+    "input": [
+      "RL",
+      "AAA = (BBB, CCC)",
+      "BBB = (DDD, EEE)",
+      "CCC = (ZZZ, GGG)",
+      "DDD = (DDD, DDD)",
+      "EEE = (EEE, EEE)",
+      "GGG = (GGG, GGG)",
+      "ZZZ = (ZZZ, ZZZ)"
+    ],
+    "alt_input": [
+      "LR",
+      "11A = (11B, XXX)",
+      "11B = (XXX, 11Z)",
+      "11Z = (11B, XXX)",
+      "22A = (22B, XXX)",
+      "22B = (22C, 22C)",
+      "22C = (22Z, 22Z)",
+      "22Z = (22B, 22B)",
+      "XXX = (XXX, XXX)"
+    ],
+    "expected_part_one": 2,
+    "expected_part_two": 6,
+    "expected_part_two_type": "long long"
   }
 ]
