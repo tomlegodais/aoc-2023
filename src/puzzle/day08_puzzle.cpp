@@ -28,7 +28,7 @@ public:
 
     void build_nodes(const std::vector<std::string> &puzzle_input) {
         std::vector<std::tuple<std::string, std::string, std::string>> connections;
-        const std::regex regex("([A-Z]{3}) = \\(([A-Z]{3}), ([A-Z]{3})\\)");
+        const std::regex regex("([A-Z0-9]{3}) = \\(([A-Z0-9]{3}), ([A-Z0-9]{3})\\)");
         for (const std::string &line: puzzle_input) {
             if (std::smatch match; std::regex_match(line, match, regex)) {
                 const std::shared_ptr<Node> node = get_node(match[1]);
