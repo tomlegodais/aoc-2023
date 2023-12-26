@@ -5,6 +5,8 @@
 #include <gmock/gmock-nice-strict.h>
 #include <nlohmann/json.hpp>
 
+#define PUZZLE_SIZE 8
+
 using testing::NiceMock;
 using json = nlohmann::json;
 using TestFunction = std::function<void(const std::vector<std::string> &, const std::vector<std::string> &, PuzzleResult, PuzzleResult, PuzzleService &)>;
@@ -53,7 +55,7 @@ std::map<int, TestFunction> map_test_functions(std::integer_sequence<int, Days..
 
 class DayPuzzleTest : public testing::TestWithParam<std::tuple<int, std::vector<std::string>, std::vector<std::string>, PuzzleResult, PuzzleResult>> {
 protected:
-    static inline std::map<int, TestFunction> test_function_map = map_test_functions(std::make_integer_sequence<int, 8>{});
+    static inline std::map<int, TestFunction> test_function_map = map_test_functions(std::make_integer_sequence<int, PUZZLE_SIZE>{});
 
     Session session_mock_;
     NiceMock<PuzzleServiceMock> puzzle_service_mock_;

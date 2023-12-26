@@ -8,6 +8,8 @@
 #include <tuple>
 #include <variant>
 
+#define PUZZLE_SIZE 8
+
 template<typename Seq>
 struct PuzzleTuple;
 
@@ -16,7 +18,7 @@ struct PuzzleTuple<std::integer_sequence<int, Days...>> {
     using type = std::tuple<DayPuzzle<Days + 1>...>;
 };
 
-using PuzzleDays = std::make_integer_sequence<int, 8>;
+using PuzzleDays = std::make_integer_sequence<int, PUZZLE_SIZE>;
 using Puzzles = PuzzleTuple<PuzzleDays>::type;
 
 template<typename Puzzle>
