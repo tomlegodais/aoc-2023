@@ -5,6 +5,7 @@
 #include <ranges>
 #include <sstream>
 #include <unordered_map>
+#include <cmath>
 
 using Race = std::pair<int, int>;
 using RaceMap = std::map<int, Race>;
