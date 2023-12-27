@@ -1,4 +1,5 @@
 #include "puzzle/day_puzzle.hpp"
+#include <algorithm>
 #include <sstream>
 
 using Sequence = std::vector<int>;
@@ -41,8 +42,11 @@ int calculate_next_value(const Sequence &original_sequence) {
         extrapolated.push_back(distances);
     }
 
-    for (int i = extrapolated.size() - 2; i >= 0; --i) {
-        extrapolated[i].push_back(extrapolated[i].back() + extrapolated[i + 1].back());
+    for (auto rit = extrapolated.rbegin() + 1; rit != extrapolated.rend(); ++rit) {
+        auto &current_vector = *rit;
+        auto &previous_vector = *std::prev(rit);
+
+        current_vector.push_back(current_vector.back() + previous_vector.back());
     }
 
     return original_sequence.back() + extrapolated[0].back();
