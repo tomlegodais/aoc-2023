@@ -144,5 +144,15 @@
     "expected_part_one": 2,
     "expected_part_two": 6,
     "expected_part_two_type": "long long"
+  },
+  {
+    "day": 9,
+    "input": [
+      "0 3 6 9 12 15",
+      "1 3 6 10 15 21",
+      "10 13 16 21 30 45"
+    ],
+    "expected_part_one": 114,
+    "expected_part_two": 2
   }
 ]

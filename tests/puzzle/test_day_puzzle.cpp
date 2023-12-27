@@ -5,7 +5,7 @@
 #include <gmock/gmock-nice-strict.h>
 #include <nlohmann/json.hpp>
 
-#define PUZZLE_SIZE 8
+#define PUZZLE_SIZE 9
 
 using testing::NiceMock;
 using json = nlohmann::json;
