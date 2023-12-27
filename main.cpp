@@ -8,7 +8,7 @@
 #include <tuple>
 #include <variant>
 
-#define PUZZLE_SIZE 8
+#define PUZZLE_SIZE 9
 
 template<typename Seq>
 struct PuzzleTuple;
