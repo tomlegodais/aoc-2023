@@ -49,7 +49,28 @@ int calculate_next_value(const Sequence &original_sequence) {
         current_vector.push_back(current_vector.back() + previous_vector.back());
     }
 
-    return original_sequence.back() + extrapolated[0].back();
+    return original_sequence.back() + extrapolated.front().back();
+}
+
+int calculate_previous_value(const Sequence &original_sequence) {
+    Sequences extrapolated;
+    auto [distances, equal_distance] = get_distances(original_sequence);
+    extrapolated.push_back(distances);
+
+    while (!equal_distance) {
+        std::tie(distances, equal_distance) = get_distances(distances);
+        extrapolated.push_back(distances);
+    }
+
+    extrapolated.back().insert(extrapolated.back().begin(), extrapolated.back().front());
+    for (auto rit = extrapolated.rbegin(); rit != extrapolated.rend() - 1; ++rit) {
+        auto &next_vector = *rit;
+        auto &current_vector = *std::next(rit);
+
+        current_vector.insert(current_vector.begin(), current_vector.front() - next_vector.front());
+    }
+
+    return original_sequence.front() - extrapolated.front().front();
 }
 
 template<>
@@ -64,8 +85,14 @@ PuzzleResult DayPuzzle<9>::solve_part_one(PuzzleService &, const std::vector<std
 }
 
 template<>
-PuzzleResult DayPuzzle<9>::solve_part_two(PuzzleService &, const std::vector<std::string> &) {
-    return 0;
+PuzzleResult DayPuzzle<9>::solve_part_two(PuzzleService &, const std::vector<std::string> &puzzle_input) {
+    const auto sequences = parse_sequences(puzzle_input);
+    int sum = 0;
+    for (auto &sequence: sequences) {
+        sum += calculate_previous_value(sequence);
+    }
+
+    return sum;
 }
 
 template<>
