@@ -1,14 +1,15 @@
+#include "PuzzleConfig.h"
 #include "puzzle/day_puzzle.hpp"
 #include "service/puzzle_service.hpp"
 #include "session/session.hpp"
 #include "util/utils.hpp"
+#include <filesystem>
 #include <iostream>
 #include <limits>
+#include <regex>
 #include <set>
 #include <tuple>
 #include <variant>
-
-#define PUZZLE_SIZE 9
 
 template<typename Seq>
 struct PuzzleTuple;
@@ -68,14 +69,12 @@ void print_result(PuzzleService &puzzle_service,
 
 template<int Day>
 void solve_puzzle(PuzzleService &puzzle_service) {
-    std::cout << std::endl
-              << "Solving puzzle for day " << Day << ", please wait..." << std::endl;
+    std::cout << std::endl << "Solving puzzle for day " << Day << ", please wait..." << std::endl;
 
     const auto puzzle_input = puzzle_service.read_puzzle_input(Day);
     constexpr PuzzleResult (DayPuzzle<Day>::*solves[])(PuzzleService &, const std::vector<std::string> &) = {
-        &DayPuzzle<Day>::solve_part_one,
-        &DayPuzzle<Day>::solve_part_two
-    };
+            &DayPuzzle<Day>::solve_part_one,
+            &DayPuzzle<Day>::solve_part_two};
 
     for (const auto &solve: solves) {
         print_result(puzzle_service, puzzle_input, solve, solve == solves[0] ? "Part One" : "Part Two");
@@ -112,8 +111,7 @@ int prompt_for_day(const std::set<int> &days) {
 
         std::cin.clear();
         std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-        std::cout << "Invalid option. Please try again." << std::endl
-                  << std::endl;
+        std::cout << "Invalid option. Please try again." << std::endl << std::endl;
     }
 }
 

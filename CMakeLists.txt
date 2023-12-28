@@ -11,6 +11,12 @@ foreach (CONFIG_TYPE IN LISTS CMAKE_CONFIGURATION_TYPES CMAKE_BUILD_TYPE)
     set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY_${CONFIG_TYPE_UPPER} ${CMAKE_BINARY_DIR}/lib)
 endforeach ()
 
+file(GLOB PUZZLE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/puzzle/day*_puzzle.cpp")
+list(LENGTH PUZZLE_FILES PUZZLE_COUNT)
+
+configure_file(templates/PuzzleConfig.h.in ${CMAKE_CURRENT_BINARY_DIR}/PuzzleConfig.h)
+include_directories(${CMAKE_CURRENT_BINARY_DIR})
+
 file(COPY ${CMAKE_SOURCE_DIR}/tests/data/ DESTINATION ${CMAKE_BINARY_DIR}/tests/data/)
 enable_testing()
 

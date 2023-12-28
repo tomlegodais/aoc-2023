@@ -1,11 +1,10 @@
+#include "PuzzleConfig.h"
 #include "puzzle/day_puzzle.hpp"
 #include "service/puzzle_service_mock.hpp"
 #include "session/session.hpp"
 #include <fstream>
 #include <gmock/gmock-nice-strict.h>
 #include <nlohmann/json.hpp>
-
-#define PUZZLE_SIZE 9
 
 using testing::NiceMock;
 using json = nlohmann::json;
