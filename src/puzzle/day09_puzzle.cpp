@@ -1,5 +1,4 @@
 #include "puzzle/day_puzzle.hpp"
-#include <algorithm>
 #include <sstream>
 
 using Sequence = std::vector<int>;

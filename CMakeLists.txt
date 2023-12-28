@@ -36,7 +36,7 @@ add_executable(aoc_2023 main.cpp
         src/puzzle/day03_puzzle.cpp src/puzzle/day04_puzzle.cpp
         src/puzzle/day05_puzzle.cpp src/puzzle/day06_puzzle.cpp
         src/puzzle/day07_puzzle.cpp src/puzzle/day08_puzzle.cpp
-        src/puzzle/day09_puzzle.cpp
+        src/puzzle/day09_puzzle.cpp src/puzzle/day10_puzzle.cpp
         include/util/utils.hpp)
 
 add_executable(aoc_2023_test tests/puzzle/test_day_puzzle.cpp
@@ -47,7 +47,7 @@ add_executable(aoc_2023_test tests/puzzle/test_day_puzzle.cpp
         src/puzzle/day03_puzzle.cpp src/puzzle/day04_puzzle.cpp
         src/puzzle/day05_puzzle.cpp src/puzzle/day06_puzzle.cpp
         src/puzzle/day07_puzzle.cpp src/puzzle/day08_puzzle.cpp
-        src/puzzle/day09_puzzle.cpp)
+        src/puzzle/day09_puzzle.cpp src/puzzle/day10_puzzle.cpp)
 
 target_link_libraries(aoc_2023 PRIVATE cpr::cpr)
 target_link_libraries(aoc_2023_test PRIVATE
