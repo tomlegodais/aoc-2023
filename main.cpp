@@ -6,7 +6,6 @@
 #include <filesystem>
 #include <iostream>
 #include <limits>
-#include <regex>
 #include <set>
 #include <tuple>
 #include <variant>
