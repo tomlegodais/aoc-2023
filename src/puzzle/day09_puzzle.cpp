@@ -1,5 +1,7 @@
 #include "puzzle/day_puzzle.hpp"
 #include <sstream>
+#include <ranges>
+#include <tuple>
 
 using Sequence = std::vector<int>;
 using Sequences = std::vector<Sequence>;
