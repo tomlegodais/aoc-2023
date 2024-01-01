@@ -1,6 +1,6 @@
 #include "puzzle/day_puzzle.hpp"
-#include <sstream>
 #include <ranges>
+#include <sstream>
 #include <tuple>
 
 using Sequence = std::vector<int>;
@@ -29,8 +29,8 @@ std::pair<Sequence, bool> get_distances(const Sequence &sequence) {
         distances.push_back(sequence[i + 1] - sequence[i]);
     }
 
-    auto all_equal = std::ranges::adjacent_find(distances, std::not_equal_to()) == distances.end();
-    return {distances, all_equal};
+    const auto all_equal = std::ranges::adjacent_find(distances, std::not_equal_to()) == distances.end();
+    return std::make_pair(distances, all_equal);
 }
 
 int calculate_next_value(const Sequence &original_sequence) {
