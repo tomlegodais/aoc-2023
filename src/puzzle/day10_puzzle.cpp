@@ -1,10 +1,10 @@
 #include "puzzle/day_puzzle.hpp"
-
 #include <algorithm>
 #include <iostream>
 #include <optional>
 #include <set>
 #include <unordered_map>
+#include <memory>
 
 class Vector2 {
 public:
