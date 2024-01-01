@@ -1,4 +1,6 @@
 #include "puzzle/day_puzzle.hpp"
+
+#include <algorithm>
 #include <iostream>
 #include <optional>
 #include <set>
@@ -8,18 +10,18 @@ class Vector2 {
 public:
     int x = 0, y = 0;
 
-    explicit Vector2(const int x, const int y) : x(x), y(y) {}
+    Vector2(const int x, const int y) : x(x), y(y) {}
 
     Vector2 operator+(const Vector2 &rhs) const {
-        return Vector2(x + rhs.x, y + rhs.y);
+        return {x + rhs.x, y + rhs.y};
     }
 
     Vector2 operator-() const {
-        return Vector2(-x, -y);
+        return {-x, -y};
     }
 
     Vector2 operator-(const Vector2 &rhs) const {
-        return Vector2(x - rhs.x, y - rhs.y);
+        return {x - rhs.x, y - rhs.y};
     }
 
     bool operator<(const Vector2 &other) const {
@@ -104,6 +106,22 @@ public:
         return visited;
     }
 
+    [[nodiscard]] int count_enclosed_tiles() const {
+        auto loop_grid = std::make_unique<char[]>(width * height);
+        std::fill(&loop_grid[0], &loop_grid[width * height], '.');
+
+        for (const auto &pos: traverse()) {
+            loop_grid[pos.y * width + pos.x] = get_tile(pos);
+        }
+
+        int count = 0;
+        for (int y = 0; y < height; ++y) {
+            count += count_row(loop_grid, y);
+        }
+
+        return count;
+    }
+
 private:
     int height, width;
     std::unique_ptr<char[]> tiles;
@@ -142,6 +160,36 @@ private:
     [[nodiscard]] bool is_connected(const Vector2 &pos, const Vector2 &dir) const {
         return get_directions(get_tile(pos + dir)).contains(-dir);
     }
+
+    static bool crosses_loop(const char &start, const char &end) {
+        if (start == 'F' && end == 'J') return true;
+        if (start == 'L' && end == '7') return true;
+        return false;
+    }
+
+    [[nodiscard]] int count_row(const std::unique_ptr<char[]> &grid, const int &y) const {
+        int count = 0;
+        bool enclosed = false;
+
+        for (int x = 0; x < width; x++) {
+            if (const auto tile = grid[y * width + x]; tile == '|') {
+                enclosed = !enclosed;
+            } else if (tile != '.') {
+                char last;
+                do {
+                    last = grid[y * width + ++x];
+                } while (last == '-');
+
+                if (crosses_loop(tile, last)) {
+                    enclosed = !enclosed;
+                }
+            } else if (enclosed) {
+                count++;
+            }
+        }
+
+        return count;
+    }
 };
 
 template<>
@@ -152,8 +200,9 @@ PuzzleResult DayPuzzle<10>::solve_part_one(PuzzleService &, const std::vector<st
 }
 
 template<>
-PuzzleResult DayPuzzle<10>::solve_part_two(PuzzleService &, const std::vector<std::string> &) {
-    return 0;
+PuzzleResult DayPuzzle<10>::solve_part_two(PuzzleService &, const std::vector<std::string> &puzzle_input) {
+    const auto pipe_maze = PipeMaze::parse(puzzle_input);
+    return pipe_maze.count_enclosed_tiles();
 }
 
 template<>
