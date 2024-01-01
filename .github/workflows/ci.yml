@@ -17,10 +17,13 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y build-essential cmake
-      - name: GCC Version
+      - name: Install g++-13
         run: |
-          gcc --version
-#      - name: Build
-#        run: make release
-#      - name: Run Tests
-#        run: make test
+          sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test -y
+          sudo apt-get update
+          sudo apt-get install -y g++-13
+          sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-13 100
+      - name: Build
+        run: make release
+      - name: Run Tests
+        run: make test
